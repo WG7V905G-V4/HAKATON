@@ -6,11 +6,17 @@ body {
   background-color: #000;
 }
 
+a {
+  text-decoration: none;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: inherit;
 }
+
+
 
 img {
   max-width: 100%;
@@ -30,29 +36,20 @@ input {
   font-family: inherit;
 }
 
-.login-section {
+
+
+.login-signin-back {
   position: relative;
   width: 100%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("img/photo_2025-04-07_19-21-57.jpg");
+  background-image: url("img/login_back.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-}
-
-/* Blue overlay on top of the background image */
-.bg-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 8, 92, 0.56);
-  z-index: 1;
 }
 
 .content-wrapper {
@@ -130,7 +127,7 @@ input {
 }
 
 /* Login Button */
-.login-btn {
+.login-singup-btn {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -143,7 +140,7 @@ input {
   transition: background-color 0.3s ease;
 }
 
-.login-btn:hover {
+.login-singup-btn:hover {
   background-color: rgba(0, 8, 116, 0.6);
 }
 
