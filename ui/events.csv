@@ -1,0 +1,8 @@
+id,title,author,tags,time_start,time_end,place,lat,lng,desc,participants
+1,Катание на лошадях,Alice,sport|music|horses,19:20,20:10,"Moskov, Pupina st.",55.7558,37.6173,Верховая прогулка по лесным тропам. Подходит для начинающих.,Alice Huyales|Gustavo Fring|Vlad Bondo
+2,Джазовый вечер,Bob,music|jazz|live,20:00,22:30,"SPb, Rubinsteina st.",59.9311,30.3609,Живой джаз в уютном баре на Рубинштейна. Вход свободный.,Maria Ivanova|John Smith|Vlad Bondo
+3,Йога в парке,Carol,sport|yoga|outdoor,08:00,09:30,"Ekb, Central Park",56.8389,60.6057,Утренняя хатха-йога на свежем воздухе. Коврик с собой.,Alice Huyales|Carol White|Peter Black
+4,Рок-концерт,Denis,music|rock|live,21:00,23:00,"Vladivostok, Arena",43.1155,131.8855,Местные рок-группы. Хардкор и альтернатива.,Denis Rock|Masha Stone|Ivan Loud
+5,Пикник у реки,Elena,outdoor|food|chill,15:00,18:00,"Astana, Riverside",51.1801,71.4460,Неформальный пикник. Берите еду и хорошее настроение.,Elena Sun|Arman K|Vlad Bondo
+6,Фотопрогулка,Fedor,photo|art|city,10:00,13:00,"Moskov, Arbat",55.7520,37.5900,Совместная фотопрогулка по старому Арбату с разбором работ.,Fedor Lens|Alice Huyales|Niko Frame
+7,Настольные игры,Gala,games|indoor|fun,18:00,21:00,"SPb, Nevsky 42",59.9340,30.3200,Коллективные настолки - Катан Диксит Имаджинариум.,Gala Play|Denis Rock|Carol White

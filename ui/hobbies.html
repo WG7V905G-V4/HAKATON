@@ -1,45 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="style.css">  <!-- ← добавь это -->
+  <meta charset="UTF-8">
+  <title>Hobbies</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://pyscript.net/releases/2024.1.1/core.js" type="module"></script>
 </head>
-<body>
-<section id="hobbies-screen" class="hobbies-section">
-  <div class="hobbies-container">
-    <!-- Header Box -->
-    <div class="header-box">
-      <h1 class="header-title">Tell us about your hobbies</h1>
-    </div>
+<body class="bg-map-img">
 
-    <!-- Hobbies Grid -->
-    <div class="hobbies-grid">
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
-      <div class="hobby-tag"><span>SPORT</span></div>
+  <div class="page-center">
+    <div class="event-card selected">
+      <div class="event-main">
+        <h1 class="panel-title">Tell us about your hobbies</h1>
+      </div>
     </div>
-
-    <!-- Action Buttons -->
-    <div class="actions-row">
-      <button class="btn btn-back">
-        <span>back</span>
-      </button>
-      <button class="btn btn-continue">
-        <span>continue</span>
-      </button>
+    <div class="filter-bar" id="hobbies-grid"></div>
+    <div class="page-actions">
+      <a href="signup.html"><div class="filter-chip">back</div></a>
+      <a href="character.html"><div class="btn-join">continue</div></a>
     </div>
   </div>
-</section>
 
+  <script type="py" src="hobbies.py"></script>
 </body>
 </html>

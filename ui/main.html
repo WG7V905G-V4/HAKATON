@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slide Panels</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://pyscript.net/releases/2024.1.1/core.js" type="module"></script>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <aside class="sidebar">
+    <div class="btn-bar">
+      <div class="nav-btn" id="btn-1">
+        <svg width="24" height="28" viewBox="0 0 24 28" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.51472 3.39697C-1.17157 7.92626 -1.17157 15.2697 3.51472 19.799L12 28L20.4853 19.799C25.1716 15.2697 25.1716 7.92626 20.4853 3.39697C15.799 -1.13232 8.20101 -1.13232 3.51472 3.39697ZM11.9999 16.2372C14.6509 16.2372 16.7999 14.1601 16.7999 11.598C16.7999 9.03582 14.6509 6.95879 11.9999 6.95879C9.34898 6.95879 7.19994 9.03582 7.19994 11.598C7.19994 14.1601 9.34898 16.2372 11.9999 16.2372Z" fill="currentColor"/></svg>
+      </div>
+      <div class="nav-btn" id="btn-2">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.6325 0.966873C5.63651 1.99558 2.47497 4.56843 1.17508 7.03495C-0.868923 10.9139 -0.196452 15.963 2.80388 19.2661C4.5586 21.1972 4.60039 21.35 4.15099 24.1759C3.41882 28.7808 4.17596 29.0976 8.08378 25.821C10.3574 23.9147 10.924 23.6799 12.5311 23.98C15.1216 24.4631 20.902 22.8763 23.1875 21.0542C29.1811 16.2766 29.6207 9.32175 24.2567 4.15392C20.0477 0.099542 14.4703 -1.03819 8.6325 0.966873Z" fill="currentColor"/></svg>
+      </div>
+      <div class="nav-btn" id="btn-3">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M20.8552 6.75862C20.8552 10.4913 17.8292 13.5172 14.0966 13.5172C10.3639 13.5172 7.33793 10.4913 7.33793 6.75862C7.33793 3.02594 10.3639 0 14.0966 0C17.8292 0 20.8552 3.02594 20.8552 6.75862Z" fill="currentColor"/><path d="M10.331 14.6759H17.669C23.3746 14.6759 28 19.3012 28 25.0069V25.2966C28 26.7896 26.7896 28 25.2966 28H2.70345C1.21037 28 0 26.7896 0 25.2966V25.0069C0 19.3012 4.62536 14.6759 10.331 14.6759Z" fill="currentColor"/></svg>
+      </div>
+      <div class="nav-btn" id="btn-4">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.5054 2.38298C16.5054 1.0669 15.4385 0 14.1224 0H13.5267C12.2106 0 11.1437 1.0669 11.1437 2.38298V11.3191H2.38298C1.0669 11.3191 0 12.386 0 13.7021V14.2979C0 15.614 1.0669 16.6809 2.38298 16.6809H11.1437V25.617C11.1437 26.9331 12.2106 28 13.5267 28H14.1224C15.4385 28 16.5054 26.9331 16.5054 25.617V16.6809H25.617C26.9331 16.6809 28 15.614 28 14.2979V13.7021C28 12.386 26.9331 11.3191 25.617 11.3191H16.5054V2.38298Z" fill="currentColor"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- panel-1: карточки генерируются Python из CSV -->
+  <div class="panel panel--narrow" id="panel-1">
+    <div class="panel-inner">
+
+      <!-- поиск + фильтры -->
+      <div class="panel-header">
+
+        <!-- поле поиска -->
+        <div class="search-wrap">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M11 11L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input class="search-input" id="search-input" type="text" placeholder="Поиск мероприятий..."/>
+        </div>
+
+        <!-- фильтры — теги из CSV -->
+        <div class="filter-bar" id="filter-bar">
+          <div class="filter-chip active" data-tag="all">Все</div>
+          <!-- остальные теги добавит Python -->
+        </div>
+
+      </div>
+
+      <ul class="event-list" id="event-list">
+        <!-- заполняется из main.py -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-2">
+    <div class="panel-inner panel-inner--full">
+      <div class="panel-tag"><span>02</span><span class="tag-sep">/</span><span>CHAT</span></div>
+      <h2 class="panel-title">Чат</h2>
+      <div class="panel-deco panel-deco--2"></div>
+      <p class="panel-text">Панель чата.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-3">
+    <div class="panel-inner panel-inner--full">
+      <div class="panel-tag"><span>03</span><span class="tag-sep">/</span><span>PROFILE</span></div>
+      <h2 class="panel-title">Профиль</h2>
+      <div class="panel-deco panel-deco--3"></div>
+      <p class="panel-text">Панель профиля.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-4">
+    <div class="panel-inner panel-inner--full">
+      <div class="panel-tag"><span>04</span><span class="tag-sep">/</span><span>NEW</span></div>
+      <h2 class="panel-title">Создать</h2>
+      <div class="panel-deco panel-deco--4"></div>
+      <p class="panel-text">Создать новое событие.</p>
+    </div>
+  </div>
+
+  <script type="py" src="main.py"></script>
+</body>
+</html>

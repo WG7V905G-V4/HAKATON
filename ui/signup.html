@@ -1,48 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="style.css">  <!-- ← добавь это -->
+  <meta charset="UTF-8">
+  <title>Sign up</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    
-<div id="login-section" class="login-signin-back">
-  <div class="content-wrapper">
-    <div class="login-card">
-      <h1 class="login-title">Sign up</h1>
-      <p class="login-subtitle">or <a class="signup-link" href="login.html">log in</a></p>
+<body class="bg-map-img">
 
-   
-      <div class="input-group">
-        <label class="input-label">name</label>
-        <input type="text" class="input-field" aria-label="name" />
+  <div class="page-center">
+    <div class="event-card selected">
+      <div class="event-main">
+        <h1 class="panel-title">Sign up</h1>
+        <p class="panel-text">or <a href="login.html" class="panel-link">log in</a></p>
       </div>
-
-      <div class="input-group">
-        <label class="input-label">login</label>
-        <input type="password" class="input-field" aria-label="password" />
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">password</label>
-        <input type="text" class="input-field" aria-label="name" />
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">age</label>
-        <input type="password" class="input-field" aria-label="password" />
+      <div class="event-expandable" style="max-height:none; opacity:1; padding-bottom:16px;">
+        <div class="input-group">
+          <span class="event-author">name</span>
+          <input type="text" class="search-input" placeholder="Your name"/>
+        </div>
+        <div class="input-group">
+          <span class="event-author">login</span>
+          <input type="text" class="search-input" placeholder="@username"/>
+        </div>
+        <div class="input-group">
+          <span class="event-author">password</span>
+          <input type="password" class="search-input" placeholder="••••••••"/>
+        </div>
+        <div class="input-group">
+          <span class="event-author">age</span>
+          <input type="number" class="search-input" placeholder="18"/>
+        </div>
       </div>
     </div>
-
-    <a href="character.html">
-        <button class="login-singup-btn">
-            <span class="btn-text">continue</span>
-        </button>
-    </a>
+    <div class="page-actions">
+      <a href="hobbies.html"><div class="btn-join">continue</div></a>
+    </div>
   </div>
-</div>
-
 
 </body>
 </html>
