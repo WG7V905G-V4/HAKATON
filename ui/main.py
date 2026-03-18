@@ -4,7 +4,7 @@ import js
 from pyscript import document
 from pyodide.ffi import create_proxy, to_js
 import asyncio
-from CONST import *
+
 
 # ── Карта ────────────────────────────────────────────────
 map_options = js.Object.new()
