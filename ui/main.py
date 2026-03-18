@@ -4,6 +4,7 @@ import js
 from pyscript import document
 from pyodide.ffi import create_proxy, to_js
 import asyncio
+from CONST import *
 
 # ── Карта ────────────────────────────────────────────────
 map_options = js.Object.new()
@@ -29,11 +30,22 @@ icon_options.iconSize   = to_js([14, 14])
 icon_options.iconAnchor = to_js([7, 7])
 marker_icon = js.L.divIcon(icon_options)
 current_marker = [None]
+current_line   = [None]  # линия маршрута
+my_location    = [None]  # мои координаты
+
+# ─────────────────────────────────────────────────────────
+# 👇 ВВЕДИ СВОИ КООРДИНАТЫ ЗДЕСЬ
+
+MY_LAT, MY_LNG = MY_LOCATION
+# ─────────────────────────────────────────────────────────
 
 def show_on_map(lat, lng, label):
     leaflet_map.invalidateSize()
     if current_marker[0] is not None:
         current_marker[0].remove()
+    if current_line[0] is not None:
+        current_line[0].remove()
+
     marker_opts = js.Object.new()
     marker_opts.icon = marker_icon
     marker = js.L.marker(to_js([lat, lng]), marker_opts)
@@ -41,22 +53,20 @@ def show_on_map(lat, lng, label):
     marker.bindPopup(f'<span style="font-weight:600;font-size:13px">{label}</span>')
     marker.openPopup()
 
-    # Сдвигаем целевой центр карты так, чтобы маркер
-    # оказался в центре СВОБОДНОЙ области (правее панели).
-    # Алгоритм: project точку в пиксели → сдвинуть влево
-    # на половину ширины UI → unproject обратно в координаты.
-    zoom     = 13
-    ui_px    = 52 + 390          # sidebar + panel в пикселях
-    offset_px = ui_px / 2        # на сколько пикселей сдвигаем центр
+    # рисуем линию от меня до мероприятия
+    if my_location[0] is not None:
+        my_lat, my_lng = my_location[0]
+        line = js.L.polyline(to_js([[my_lat, my_lng], [lat, lng]]), to_js({"color": "#ff4a4a", "weight": 3, "dashArray": "6,10"}))
+        line.addTo(leaflet_map)
+        current_line[0] = line
 
-    # project(latlng, zoom) → Point в пикселях
-    pt = leaflet_map.project(to_js([lat, lng]), zoom)
-    # сдвигаем x влево — карта компенсирует сдвигом вправо
-    shifted = js.L.point(pt.x - offset_px, pt.y)
-    # unproject обратно в географические координаты
+    zoom      = 13
+    ui_px     = 52 + 390
+    offset_px = ui_px / 2
+    pt         = leaflet_map.project(to_js([lat, lng]), zoom)
+    shifted    = js.L.point(pt.x - offset_px, pt.y)
     new_center = leaflet_map.unproject(shifted, zoom)
-
-    fly_opts = js.Object.new()
+    fly_opts          = js.Object.new()
     fly_opts.duration = 1.0
     leaflet_map.flyTo(new_center, zoom, fly_opts)
     current_marker[0] = marker
@@ -88,7 +98,6 @@ for p, b in zip(panels, buttons):
 
 # ── Построение карточки ───────────────────────────────────
 def build_card_html(row):
-    # участники через | внутри одной колонки
     participants_html = ""
     raw = row.get("participants", "").strip()
     if raw:
@@ -141,7 +150,7 @@ def make_card_handler(card):
     return create_proxy(handler)
 
 # ── Загрузка CSV ─────────────────────────────────────────
-all_rows = []  # все строки CSV — нужны для фильтрации
+all_rows = []
 
 async def load_events():
     response = await js.fetch("events.csv")
@@ -153,10 +162,8 @@ async def load_events():
     rows   = list(reader)
     all_rows.extend(rows)
 
-    # ── Рендер карточек ──────────────────────────────────
     render_cards(rows)
 
-    # ── Собираем уникальные теги и строим фильтры ────────
     seen = set()
     filter_bar = document.getElementById("filter-bar")
     for row in rows:
@@ -169,12 +176,10 @@ async def load_events():
                     f'<div class="filter-chip" data-tag="{tag}">{tag}</div>'
                 )
 
-    # ── Хендлеры фильтров ────────────────────────────────
     chips = document.querySelectorAll(".filter-chip")
     for i in range(chips.length):
         chips[i].addEventListener("click", make_filter_handler(chips[i]))
 
-    # ── Хендлер поиска ───────────────────────────────────
     search = document.getElementById("search-input")
     search.addEventListener("input", create_proxy(on_search))
 
@@ -199,10 +204,8 @@ def apply_filters():
     filtered = []
     for row in all_rows:
         tags = [t.strip().lower() for t in row.get("tags","").split("|")]
-        # фильтр по тегу
         if tag != "all" and tag.lower() not in tags:
             continue
-        # фильтр по поиску — ищем в названии, авторе, тегах, месте
         if query:
             haystack = " ".join([
                 row.get("title",""),
@@ -235,3 +238,38 @@ document.getElementById("panel-1").classList.add("open")
 document.getElementById("btn-1").classList.add("active")
 document.querySelector("body").classList.add("panel-1-open")
 current_open[0] = "panel-1"
+
+# ── Геолокация ───────────────────────────────────────────
+def on_location(position):
+    lat = position.coords.latitude
+    lng = position.coords.longitude
+    my_location[0] = (lat, lng)
+
+    my_icon_options = js.Object.new()
+    my_icon_options.className = ""
+    my_icon_options.html = (
+        '<div style="width:14px;height:14px;background:#ff4a4a;'
+        'border-radius:50%;border:3px solid #fff;'
+        'box-shadow:0 2px 8px rgba(255,74,74,0.6);"></div>'
+    )
+    my_icon_options.iconSize   = to_js([14, 14])
+    my_icon_options.iconAnchor = to_js([7, 7])
+    my_icon = js.L.divIcon(my_icon_options)
+
+    marker_opts = js.Object.new()
+    marker_opts.icon = my_icon
+    marker = js.L.marker(to_js([lat, lng]), marker_opts)
+    marker.addTo(leaflet_map)
+    marker.bindPopup('<span style="font-weight:600;font-size:13px">Я здесь</span>')
+    marker.openPopup()
+    leaflet_map.setView(to_js([lat, lng]), 13)
+
+def on_error(error):
+    # геолокация недоступна — используем координаты вручную
+    my_location[0] = (MY_LAT, MY_LNG)
+    leaflet_map.setView(to_js([MY_LAT, MY_LNG]), 13)
+
+js.navigator.geolocation.getCurrentPosition(
+    create_proxy(on_location),
+    create_proxy(on_error)
+)

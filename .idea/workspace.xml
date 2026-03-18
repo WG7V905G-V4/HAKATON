@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a6bd33f6-a484-4978-ab4b-13079329920f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CONST.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/create_csv_events.py" afterDir="false" />
+    <list default="true" id="a6bd33f6-a484-4978-ab4b-13079329920f" name="Changes" comment="added csv creator, and sort of events">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/hobbies.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/hobbies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +70,15 @@
       <option name="presentableId" value="Default" />
       <updated>1772545731080</updated>
     </task>
+    <task id="LOCAL‎-00001" summary="added csv creator, and sort of events">
+      <option name="closed" value="true" />
+      <created>1773860575412</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL‎-00001" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1773860575412</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -83,5 +91,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="added csv creator, and sort of events" />
+    <option name="LAST_COMMIT_MESSAGE" value="added csv creator, and sort of events" />
   </component>
 </project>
