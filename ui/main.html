@@ -30,36 +30,42 @@
     </div>
   </aside>
 
-  <!-- panel-1: карточки генерируются Python из CSV -->
+  <!-- panel-1: мероприятия -->
   <div class="panel panel--narrow" id="panel-1">
-    <div class="panel-inner">
 
-      <!-- поиск + фильтры -->
-      <div class="panel-header">
-
-        <!-- поле поиска -->
-        <div class="search-wrap">
-          <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M11 11L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <input class="search-input" id="search-input" type="text" placeholder="Поиск мероприятий..."/>
-        </div>
-
-        <!-- фильтры — теги из CSV -->
-        <div class="filter-bar" id="filter-bar">
-          <div class="filter-chip active" data-tag="all">Все</div>
-          <!-- остальные теги добавит Python -->
-        </div>
-
+    <!--
+      panel-header — прямой ребёнок .panel, НЕ внутри panel-inner.
+      Это позволяет ему:
+      1. Быть position:absolute поверх event-list
+      2. Не участвовать в translateX-анимации panel-inner
+      3. Не обрезаться overflow:hidden panel-inner
+    -->
+    <div class="panel-header">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M11 11L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input class="search-input" id="search-input" type="text" placeholder="Поиск..."/>
       </div>
-
-      <ul class="event-list" id="event-list">
-        <!-- заполняется из main.py -->
-      </ul>
+      <div class="filter-dropdown-wrap">
+        <div class="filter-chip" id="filter-toggle">
+          <span id="filter-label">Все категории</span>
+          <span class="filter-arrow">▾</span>
+        </div>
+        <div class="filter-dropdown" id="filter-dropdown">
+          <div class="filter-chip active" data-tag="all">Все</div>
+        </div>
+      </div>
     </div>
+
+    <div class="panel-inner">
+      <ul class="event-list" id="event-list"></ul>
+    </div>
+
   </div>
 
+  <!-- panel-2: чат -->
   <div class="panel" id="panel-2">
     <div class="panel-inner panel-inner--full">
       <div class="panel-tag"><span>02</span><span class="tag-sep">/</span><span>CHAT</span></div>
@@ -69,6 +75,7 @@
     </div>
   </div>
 
+  <!-- panel-3: профиль -->
   <div class="panel" id="panel-3">
     <div class="panel-inner panel-inner--full">
       <div class="panel-tag"><span>03</span><span class="tag-sep">/</span><span>PROFILE</span></div>
@@ -78,12 +85,80 @@
     </div>
   </div>
 
-  <div class="panel" id="panel-4">
-    <div class="panel-inner panel-inner--full">
-      <div class="panel-tag"><span>04</span><span class="tag-sep">/</span><span>NEW</span></div>
-      <h2 class="panel-title">Создать</h2>
-      <div class="panel-deco panel-deco--4"></div>
-      <p class="panel-text">Создать новое событие.</p>
+  <!-- panel-4: создать мероприятие -->
+  <div class="panel panel--narrow" id="panel-4">
+    <div class="panel-inner">
+      <div class="panel-header">
+        <p class="create-title">Новое мероприятие</p>
+      </div>
+      <div class="create-form" id="create-form">
+
+        <div class="create-field">
+          <label class="create-label">Название</label>
+          <input class="search-input" id="new-title" type="text" placeholder="Напр. Вечерняя пробежка"/>
+        </div>
+
+        <div class="create-field">
+          <label class="create-label">Автор</label>
+          <input class="search-input" id="new-author" type="text" placeholder="Твоё имя"/>
+        </div>
+
+        <div class="create-field">
+          <label class="create-label">Теги (через |)</label>
+          <input class="search-input" id="new-tags" type="text" placeholder="sport|outdoor|run"/>
+        </div>
+
+        <div class="create-field create-field--row">
+          <div class="create-field">
+            <label class="create-label">Начало</label>
+            <input class="search-input" id="new-time-start" type="time"/>
+          </div>
+          <div class="create-field">
+            <label class="create-label">Конец</label>
+            <input class="search-input" id="new-time-end" type="time"/>
+          </div>
+        </div>
+
+        <div class="create-field">
+          <label class="create-label">Место</label>
+          <input class="search-input" id="new-place" type="text" placeholder="Город, улица"/>
+        </div>
+
+        <div class="create-field">
+          <label class="create-label">Описание</label>
+          <textarea class="search-input create-textarea" id="new-desc" placeholder="Расскажи подробнее..."></textarea>
+        </div>
+
+        <div class="create-section-label">Точка А — старт маршрута</div>
+        <div class="create-field create-field--row">
+          <div class="create-field">
+            <label class="create-label">Широта</label>
+            <input class="search-input" id="new-lat" type="number" step="0.0001" placeholder="55.7558"/>
+          </div>
+          <div class="create-field">
+            <label class="create-label">Долгота</label>
+            <input class="search-input" id="new-lng" type="number" step="0.0001" placeholder="37.6173"/>
+          </div>
+        </div>
+
+        <div class="create-section-label">Точка B — конец маршрута <span class="create-optional">(необязательно)</span></div>
+        <div class="create-field create-field--row">
+          <div class="create-field">
+            <label class="create-label">Широта</label>
+            <input class="search-input" id="new-lat2" type="number" step="0.0001" placeholder="55.7700"/>
+          </div>
+          <div class="create-field">
+            <label class="create-label">Долгота</label>
+            <input class="search-input" id="new-lng2" type="number" step="0.0001" placeholder="37.6400"/>
+          </div>
+        </div>
+
+        <div class="create-actions">
+          <div class="create-hint" id="create-hint"></div>
+          <div class="btn-join" id="btn-create">Создать</div>
+        </div>
+
+      </div>
     </div>
   </div>
 
