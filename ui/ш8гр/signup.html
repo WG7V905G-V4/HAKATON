@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up</title>
+  <link rel="stylesheet" href="account-setup-style.css" />
+</head>
+<body>
+
+  <div class="page-bg" style="--page-bg: url('img/login_back.jpg');"></div>
+
+  <div class="page-center">
+    <div class="glass-card signup-card anim">
+
+      <div class="signup-heading anim anim-d1">
+        <h1 id="heading-title">Sign up</h1>
+        <div class="signup-toggle" id="toggle-link" onclick="toggleMode()">or log in</div>
+      </div>
+
+      <div id="flash" class="flash"></div>
+
+      <div class="signup-fields anim anim-d2">
+
+        <div class="field-group" id="row-name">
+          <label class="field-label" for="inp-name">Name</label>
+          <input class="field-input" id="inp-name" type="text" placeholder="Your name" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="inp-username">Username</label>
+          <input class="field-input" id="inp-username" type="text" placeholder="unique_username" autocomplete="off" />
+        </div>
+
+        <div class="field-group" id="row-age">
+          <label class="field-label" for="inp-age">Age</label>
+          <input class="field-input" id="inp-age" type="number" min="1" max="120" placeholder="25" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="inp-password">Password</label>
+          <input class="field-input" id="inp-password" type="password" placeholder="••••••••" autocomplete="off" />
+        </div>
+
+      </div>
+
+      <div class="signup-footer anim anim-d3">
+        <button class="btn btn-primary" onclick="handleSubmit()">continue</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let isLogin = false;
+
+    function toggleMode() {
+      isLogin = !isLogin;
+      document.getElementById('heading-title').textContent = isLogin ? 'Log in'    : 'Sign up';
+      document.getElementById('toggle-link').textContent   = isLogin ? 'or sign up' : 'or log in';
+      document.getElementById('row-name').style.display    = isLogin ? 'none' : '';
+      document.getElementById('row-age').style.display     = isLogin ? 'none' : '';
+      hideFlash();
+    }
+
+    function showFlash(msg, type) {
+      const el = document.getElementById('flash');
+      el.textContent = msg;
+      el.className = 'flash ' + type;
+      el.style.display = 'block';
+    }
+    function hideFlash() {
+      const el = document.getElementById('flash');
+      el.style.display = 'none';
+    }
+
+    function handleSubmit() {
+      hideFlash();
+      const username = document.getElementById('inp-username').value.trim();
+      const password = document.getElementById('inp-password').value;
+      if (!username || !password) { showFlash('Please fill in all required fields.', 'error'); return; }
+
+      const payload = isLogin
+        ? { mode: 'login', username, password }
+        : {
+            mode: 'signup',
+            name:     document.getElementById('inp-name').value.trim(),
+            username,
+            age:      document.getElementById('inp-age').value.trim(),
+            password
+          };
+
+      if (!isLogin && (!payload.name || !payload.age)) {
+        showFlash('Please fill in all fields.', 'error'); return;
+      }
+
+      fetch('/signup.py', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.ok) {
+          sessionStorage.setItem('draft_user', JSON.stringify(res.user));
+          window.location.href = res.redirect === 'dashboard' ? 'dashboard.html' : 'hobbies.html';
+        } else {
+          showFlash(res.error || 'Something went wrong.', 'error');
+        }
+      })
+      .catch(() => {
+        // Demo: no server — simulate flow
+        const user = {
+          name:     document.getElementById('inp-name').value.trim() || username,
+          username,
+          age:      document.getElementById('inp-age').value.trim() || '',
+          hobbies:  [],
+          answers:  {}
+        };
+        sessionStorage.setItem('draft_user', JSON.stringify(user));
+        window.location.href = isLogin ? 'dashboard.html' : 'hobbies.html';
+      });
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+  </script>
+</body>
+</html>

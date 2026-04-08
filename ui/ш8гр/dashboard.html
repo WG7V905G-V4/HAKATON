@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="account-setup-style.css" />
+</head>
+<body>
+
+  <div class="page-bg" style="--page-bg: url('img/login_back.jpg');"></div>
+
+  <div class="page-center">
+    <div class="glass-card profile-card anim">
+
+      <div class="profile-avatar anim anim-d1" id="avatar">?</div>
+      <div class="profile-name anim anim-d2"   id="p-name">—</div>
+      <div class="profile-meta anim anim-d2"   id="p-meta">—</div>
+
+      <div class="divider anim anim-d3"></div>
+
+      <!-- хобби -->
+      <div class="profile-hobbies anim anim-d3" id="p-hobbies"></div>
+
+      <!-- ответы -->
+      <div class="profile-answers anim anim-d4" id="p-answers"></div>
+
+      <div class="divider anim anim-d4"></div>
+
+      <button class="btn btn-ghost anim anim-d5" onclick="logout()">log out</button>
+
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      sessionStorage.clear();
+      fetch('/dashboard.py', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'logout' })
+      }).catch(() => {}).finally(() => { window.location.href = 'signup.html'; });
+    }
+
+    async function loadProfile() {
+      let user = null;
+
+      const draft = sessionStorage.getItem('draft_user');
+      if (draft) { user = JSON.parse(draft); }
+
+      if (!user) {
+        try {
+          const res  = await fetch('/dashboard.py');
+          const data = await res.json();
+          if (data.ok) { user = data.user; }
+          else         { window.location.href = 'signup.html'; return; }
+        } catch {
+          window.location.href = 'signup.html'; return;
+        }
+      }
+
+      render(user);
+    }
+
+    function render(u) {
+      // аватар — первые 2 буквы имени
+      const initials = (u.name || u.username || '?')
+        .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      document.getElementById('avatar').textContent = initials;
+
+      document.getElementById('p-name').textContent =
+        u.name || u.username;
+
+      document.getElementById('p-meta').textContent =
+        `@${u.username}` + (u.age ? `  ·  age ${u.age}` : '');
+
+      // хобби
+      const hobbiesEl = document.getElementById('p-hobbies');
+      if (u.hobbies && u.hobbies.length) {
+        u.hobbies.forEach(h => {
+          const tag = document.createElement('span');
+          tag.className   = 'hobby-tag';
+          tag.textContent = h;
+          hobbiesEl.appendChild(tag);
+        });
+      } else {
+        hobbiesEl.innerHTML =
+          '<span style="font-size:11px;color:var(--dimmed)">No hobbies selected</span>';
+      }
+
+      // ответы
+      const answersEl = document.getElementById('p-answers');
+      if (u.answers && Object.keys(u.answers).length) {
+        Object.entries(u.answers).forEach(([i, v]) => {
+          const row = document.createElement('div');
+          row.className = 'profile-answer-row';
+          row.innerHTML =
+            `<span class="answer-label">Q${Number(i) + 1}</span>` +
+            `<span class="answer-value">${v}</span>`;
+          answersEl.appendChild(row);
+        });
+      }
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>
