@@ -1,119 +1,87 @@
-#!/usr/bin/env python3
 """
-hobbies.py — Handles GET /hobbies.py and POST /hobbies.py
+hobbies.py — страница выбора хобби.
 
-GET  → returns {"hobbies": ["Photography", "Gaming", ...]} from hobbies.csv
-POST → updates the logged-in user's hobbies field in users.csv
-       body: {"hobbies": ["Gaming", "Reading"]}
-       cookie: session_token=<token>
+Читает hobbies.csv через fetch (только чтение — это разрешено браузером).
+Выбранные хобби сохраняет в localStorage в черновик пользователя.
 """
 
-import json
+import io
 import csv
-from pathlib import Path
-from signup import get_session_user, _load_users, _save_users, FIELDNAMES
+import json
+import asyncio
+from js import document, window, localStorage, fetch
+from pyodide.ffi import create_proxy
 
-HOBBIES_CSV = Path("hobbies.csv")
+# ── утилиты ───────────────────────────────────────────────
 
+def _get_draft() -> dict:
+    raw = window.sessionStorage.getItem("draft_user")
+    return json.loads(raw) if raw else {}
 
-# ── Read hobbies.csv ───────────────────────────────────────────────────────────
+def _save_draft(draft: dict) -> None:
+    window.sessionStorage.setItem("draft_user", json.dumps(draft))
 
-def load_hobbies() -> list[str]:
-    """
-    Parse hobbies.csv.
-    Expected format — one column named 'hobby':
-        hobby
-        Photography
-        Gaming
-        ...
-    Falls back to first column if 'hobby' header not found.
-    """
-    if not HOBBIES_CSV.exists():
-        return _default_hobbies()
+# ── состояние ─────────────────────────────────────────────
 
-    with open(HOBBIES_CSV, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        field = None
-        hobbies = []
-        for row in reader:
-            if field is None:
-                # Auto-detect column
-                keys = [k.strip().lower() for k in row.keys()]
-                field = list(row.keys())[keys.index("hobby")] if "hobby" in keys else list(row.keys())[0]
-            val = row[field].strip()
-            if val:
-                hobbies.append(val)
-        return hobbies if hobbies else _default_hobbies()
+selected: set[str] = set()
 
+# ── рендер чипов ──────────────────────────────────────────
 
-def _default_hobbies() -> list[str]:
-    return [
-        "Photography", "Cooking", "Gaming", "Reading", "Hiking",
-        "Music", "Travel", "Painting", "Cycling", "Dancing",
-        "Swimming", "Yoga", "Coding", "Gardening", "Chess",
-        "Writing", "Fishing", "Surfing", "Climbing", "Pottery",
-    ]
+def render_chips(hobbies: list[str]) -> None:
+    container = document.getElementById("chips-container")
+    container.innerHTML = ""
+    for hobby in hobbies:
+        btn = document.createElement("button")
+        btn.className   = "chip"
+        btn.textContent = hobby
 
+        def make_handler(h, el):
+            def handler(event):
+                if h in selected:
+                    selected.discard(h)
+                    el.classList.remove("selected")
+                else:
+                    selected.add(h)
+                    el.classList.add("selected")
+            return create_proxy(handler)
 
-# ── Save hobbies to user record ────────────────────────────────────────────────
+        btn.addEventListener("click", make_handler(hobby, btn))
+        container.appendChild(btn)
 
-def save_user_hobbies(username: str, hobbies: list[str]) -> bool:
-    """
-    Update the hobbies field for `username` in users.csv.
-    Hobbies are stored pipe-separated: "Gaming|Reading|Yoga"
-    Returns True on success.
-    """
-    users = _load_users()
-    found = False
-    for user in users:
-        if user["username"].lower() == username.lower():
-            user["hobbies"] = "|".join(hobbies)
-            found = True
-            break
-    if found:
-        _save_users(users)
-    return found
+# ── загрузка CSV ───────────────────────────────────────────
 
+async def load_hobbies() -> None:
+    hobbies = []
+    try:
+        resp     = await fetch("hobbies.csv")
+        buf      = await resp.arrayBuffer()
+        text     = window.TextDecoder.new("utf-8").decode(buf)
+        reader   = csv.DictReader(io.StringIO(text))
+        header   = reader.fieldnames or []
+        col      = "hobby" if "hobby" in [h.lower() for h in header] else header[0]
+        hobbies  = [row[col].strip() for row in reader if row[col].strip()]
+    except Exception:
+        hobbies = [
+            "Photography", "Cooking", "Gaming", "Reading", "Hiking",
+            "Music", "Travel", "Painting", "Cycling", "Dancing",
+            "Swimming", "Yoga", "Coding", "Gardening", "Chess",
+            "Writing", "Fishing", "Surfing", "Climbing", "Pottery",
+            "Skateboarding т", "Film", "3D Art", "Drawing",
+        ]
+    render_chips(hobbies)
 
-# ── Request handler ────────────────────────────────────────────────────────────
+asyncio.ensure_future(load_hobbies())
 
-def handle_request(method: str, body_bytes: bytes, cookie_header: str = "") -> dict:
-    if method == "GET":
-        return {"hobbies": load_hobbies()}
+# ── навигация ─────────────────────────────────────────────
 
-    if method == "POST":
-        # Authenticate
-        token = _extract_token(cookie_header)
-        username = get_session_user(token) if token else None
-        if not username:
-            return {"ok": False, "error": "Not authenticated."}
+def on_back(event=None):
+    window.location.href = "signup.html"
 
-        try:
-            body = json.loads(body_bytes)
-        except Exception:
-            return {"ok": False, "error": "Invalid JSON."}
+def on_continue(event=None):
+    draft = _get_draft()
+    draft["hobbies"] = list(selected)
+    _save_draft(draft)
+    window.location.href = "questions.html"
 
-        hobbies = body.get("hobbies", [])
-        if not isinstance(hobbies, list):
-            return {"ok": False, "error": "hobbies must be a list."}
-
-        ok = save_user_hobbies(username, hobbies)
-        return {"ok": ok, "error": None if ok else "User not found."}
-
-    return {"ok": False, "error": "Method not allowed."}
-
-
-def _extract_token(cookie_header: str) -> str | None:
-    """Parse session_token from Cookie header string."""
-    if not cookie_header:
-        return None
-    for part in cookie_header.split(";"):
-        k, _, v = part.strip().partition("=")
-        if k.strip() == "session_token":
-            return v.strip()
-    return None
-
-
-# ── Standalone test ────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    print("Hobbies:", load_hobbies())
+document.getElementById("btn-back").addEventListener("click",     create_proxy(on_back))
+document.getElementById("btn-continue").addEventListener("click", create_proxy(on_continue))

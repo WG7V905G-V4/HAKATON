@@ -1,216 +1,149 @@
-#!/usr/bin/env python3
 """
-signup.py — Handles POST /signup.py
-Modes:
-  signup → validate unique username, hash password, write to users.csv
-  login  → verify credentials, set session cookie
+signup.py — логика страницы Sign up / Log in.
 
-Run with: python server.py  (see server.py)
-This module is imported by the HTTP server.
+Хранилище: localStorage браузера.
+Структура записи пользователя (JSON-строка под ключом "user:<username>"):
+  {
+    "name":     str,
+    "username": str,
+    "age":      str,
+    "password": str,   # SHA-256 hex (через hashlib в Pyodide)
+    "hobbies":  [],
+    "answers":  {}
+  }
+
+Текущая сессия хранится под ключом "session" — просто username.
 """
 
-import json
-import csv
 import hashlib
-import os
-import http.cookies
-import secrets
-from pathlib import Path
+import json
+from js import document, window, localStorage
 
-USERS_CSV = Path("users.csv")
-SESSIONS_FILE = Path("sessions.json")
+# ── утилиты ───────────────────────────────────────────────────────────────────
 
-FIELDNAMES = ["name", "username", "age", "password_hash", "hobbies", "answers"]
-
-
-# ── CSV helpers ────────────────────────────────────────────────────────────────
-
-def _load_users() -> list[dict]:
-    if not USERS_CSV.exists():
-        return []
-    with open(USERS_CSV, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        return list(reader)
-
-
-def _save_users(users: list[dict]) -> None:
-    with open(USERS_CSV, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
-        writer.writeheader()
-        writer.writerows(users)
-
-
-def _hash_password(password: str) -> str:
+def _hash(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+def _load_user(username: str) -> dict | None:
+    raw = localStorage.getItem(f"user:{username.lower()}")
+    return json.loads(raw) if raw else None
 
-# ── Session helpers ────────────────────────────────────────────────────────────
+def _save_user(user: dict) -> None:
+    localStorage.setItem(
+        f"user:{user['username'].lower()}",
+        json.dumps(user)
+    )
 
-def _load_sessions() -> dict:
-    if not SESSIONS_FILE.exists():
-        return {}
-    with open(SESSIONS_FILE, encoding="utf-8") as f:
-        return json.load(f)
+def _set_session(username: str) -> None:
+    localStorage.setItem("session", username.lower())
 
+def _show_flash(msg: str, kind: str = "error") -> None:
+    el = document.getElementById("flash")
+    el.textContent = msg
+    el.className   = f"flash {kind}"
+    el.style.display = "block"
 
-def _save_sessions(sessions: dict) -> None:
-    with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
-        json.dump(sessions, f)
+def _hide_flash() -> None:
+    document.getElementById("flash").style.display = "none"
 
+# ── режим (signup / login) ────────────────────────────────────────────────────
 
-def create_session(username: str) -> str:
-    """Create a session token for the user. Returns the token."""
-    token = secrets.token_hex(32)
-    sessions = _load_sessions()
-    sessions[token] = username
-    _save_sessions(sessions)
-    return token
+is_login = False
 
+def toggle_mode(event=None):
+    global is_login
+    is_login = not is_login
 
-def get_session_user(token: str) -> str | None:
-    """Return username for token, or None if invalid."""
-    sessions = _load_sessions()
-    return sessions.get(token)
+    document.getElementById("heading-title").textContent = \
+        "Log in" if is_login else "Sign up"
+    document.getElementById("toggle-link").textContent = \
+        "or sign up" if is_login else "or log in"
+    document.getElementById("row-name").style.display = \
+        "none" if is_login else ""
+    document.getElementById("row-age").style.display  = \
+        "none" if is_login else ""
+    _hide_flash()
 
+# ── submit ────────────────────────────────────────────────────────────────────
 
-def delete_session(token: str) -> None:
-    sessions = _load_sessions()
-    sessions.pop(token, None)
-    _save_sessions(sessions)
+def handle_submit(event=None):
+    _hide_flash()
 
-
-# ── Core logic ─────────────────────────────────────────────────────────────────
-
-def handle_signup(body: dict) -> dict:
-    """
-    Register a new user.
-    Returns {"ok": True, "user": {...}, "redirect": "hobbies"} or {"ok": False, "error": "..."}
-    """
-    name = (body.get("name") or "").strip()
-    username = (body.get("username") or "").strip()
-    age = str(body.get("age") or "").strip()
-    password = body.get("password") or ""
-
-    if not all([name, username, age, password]):
-        return {"ok": False, "error": "All fields are required."}
-
-    if not username.isalnum():
-        return {"ok": False, "error": "Username must contain only letters and numbers."}
-
-    users = _load_users()
-
-    # Check uniqueness
-    if any(u["username"].lower() == username.lower() for u in users):
-        return {"ok": False, "error": "This username is already taken."}
-
-    # Create user record (hobbies/answers filled in later pages)
-    new_user = {
-        "name": name,
-        "username": username,
-        "age": age,
-        "password_hash": _hash_password(password),
-        "hobbies": "",
-        "answers": "",
-    }
-    users.append(new_user)
-    _save_users(users)
-
-    token = create_session(username)
-
-    return {
-        "ok": True,
-        "redirect": "hobbies",
-        "session_token": token,
-        "user": {"name": name, "username": username, "age": age},
-    }
-
-
-def handle_login(body: dict) -> dict:
-    """
-    Authenticate existing user.
-    Returns {"ok": True, "user": {...}, "redirect": "dashboard"} or {"ok": False, "error": "..."}
-    """
-    username = (body.get("username") or "").strip()
-    password = body.get("password") or ""
+    username = document.getElementById("inp-username").value.strip()
+    password = document.getElementById("inp-password").value
 
     if not username or not password:
-        return {"ok": False, "error": "Username and password are required."}
+        _show_flash("Please fill in all required fields.")
+        return
 
-    users = _load_users()
-    match = next((u for u in users if u["username"].lower() == username.lower()), None)
-
-    if not match or match["password_hash"] != _hash_password(password):
-        return {"ok": False, "error": "Invalid username or password."}
-
-    token = create_session(match["username"])
-
-    # Parse stored hobbies/answers
-    hobbies = [h for h in match.get("hobbies", "").split("|") if h]
-    try:
-        answers = json.loads(match.get("answers", "{}") or "{}")
-    except json.JSONDecodeError:
-        answers = {}
-
-    return {
-        "ok": True,
-        "redirect": "dashboard",
-        "session_token": token,
-        "user": {
-            "name": match["name"],
-            "username": match["username"],
-            "age": match["age"],
-            "hobbies": hobbies,
-            "answers": answers,
-        },
-    }
-
-
-# ── WSGI-style handler (used by server.py) ────────────────────────────────────
-
-def handle_request(method: str, body_bytes: bytes, cookie_header: str = "") -> tuple[dict, str]:
-    """
-    Returns (response_dict, session_token_or_empty_string).
-    server.py sets the Set-Cookie header if token is non-empty.
-    """
-    if method != "POST":
-        return {"ok": False, "error": "Method not allowed."}, ""
-
-    try:
-        body = json.loads(body_bytes)
-    except Exception:
-        return {"ok": False, "error": "Invalid JSON."}, ""
-
-    mode = body.get("mode")
-    if mode == "signup":
-        result = handle_signup(body)
-    elif mode == "login":
-        result = handle_login(body)
+    if is_login:
+        _do_login(username, password)
     else:
-        return {"ok": False, "error": "Unknown mode."}, ""
+        _do_signup(username, password)
 
-    token = result.pop("session_token", "")
-    return result, token
+def _do_signup(username: str, password: str) -> None:
+    name = document.getElementById("inp-name").value.strip()
+    age  = document.getElementById("inp-age").value.strip()
 
+    if not name or not age:
+        _show_flash("Please fill in all fields.")
+        return
 
-# ── Standalone test ────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    # Quick smoke test
-    print("=== Signup test ===")
-    r, t = handle_request("POST", json.dumps({
-        "mode": "signup", "name": "Alice", "username": "alice",
-        "age": "25", "password": "secret"
-    }).encode())
-    print(r, "token:", t)
+    if not username.replace("_", "").isalnum():
+        _show_flash("Username: letters, numbers and _ only.")
+        return
 
-    print("\n=== Login test ===")
-    r, t = handle_request("POST", json.dumps({
-        "mode": "login", "username": "alice", "password": "secret"
-    }).encode())
-    print(r, "token:", t)
+    if _load_user(username):
+        _show_flash("This username is already taken.")
+        return
 
-    print("\n=== Duplicate username ===")
-    r, _ = handle_request("POST", json.dumps({
-        "mode": "signup", "name": "Bob", "username": "alice",
-        "age": "30", "password": "other"
-    }).encode())
-    print(r)
+    user = {
+        "name":     name,
+        "username": username.lower(),
+        "age":      age,
+        "password": _hash(password),
+        "hobbies":  [],
+        "answers":  {}
+    }
+    _save_user(user)
+    _set_session(username)
+
+    # передаём черновик профиля в sessionStorage для следующих страниц
+    window.sessionStorage.setItem("draft_user", json.dumps({
+        "name":     name,
+        "username": username.lower(),
+        "age":      age,
+        "hobbies":  [],
+        "answers":  {}
+    }))
+
+    window.location.href = "hobbies.html"
+
+def _do_login(username: str, password: str) -> None:
+    user = _load_user(username)
+
+    if not user or user["password"] != _hash(password):
+        _show_flash("Invalid username or password.")
+        return
+
+    _set_session(username)
+    window.sessionStorage.setItem("draft_user", json.dumps({
+        "name":     user["name"],
+        "username": user["username"],
+        "age":      user["age"],
+        "hobbies":  user.get("hobbies", []),
+        "answers":  user.get("answers", {})
+    }))
+    window.location.href = "dashboard.html"
+
+# ── wire up ───────────────────────────────────────────────────────────────────
+
+document.getElementById("toggle-link").addEventListener("click",  toggle_mode)
+document.getElementById("btn-continue").addEventListener("click", handle_submit)
+
+# Enter key
+def _on_keydown(event):
+    if event.key == "Enter":
+        handle_submit()
+
+document.addEventListener("keydown", _on_keydown)

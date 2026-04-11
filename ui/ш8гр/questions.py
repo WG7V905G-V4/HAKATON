@@ -1,40 +1,82 @@
-#!/usr/bin/env python3
 """
-questions.py — Handles GET /questions.py and POST /questions.py
+questions.py — страница с вопросами.
 
-GET  → returns {"questions": [{"question": "...", "options": [...]}]}
-POST → saves answers + hobbies to users.csv (final step of registration)
-       body: {"username":..., "hobbies":[...], "answers":{0: "...", 1: "..."}, ...}
-       cookie: session_token=<token>  (or username passed directly for demo mode)
+Читает questions.csv через fetch.
+Ответы + черновик профиля сохраняет в localStorage.
+После сабмита финализирует запись пользователя:
+  localStorage["user:<username>"] = {...полный профиль...}
 """
 
-import json
+import io
 import csv
-from pathlib import Path
-from signup import get_session_user, _load_users, _save_users
+import json
+import asyncio
+from js import document, window, localStorage, fetch
+from pyodide.ffi import create_proxy
 
-QUESTIONS_CSV = Path("questions.csv")
+# ── черновик ──────────────────────────────────────────────
 
+def _get_draft() -> dict:
+    raw = window.sessionStorage.getItem("draft_user")
+    return json.loads(raw) if raw else {}
 
-# ── Read questions.csv ─────────────────────────────────────────────────────────
+def _save_draft(draft: dict) -> None:
+    window.sessionStorage.setItem("draft_user", json.dumps(draft))
 
-def load_questions() -> list[dict]:
-    """
-    Parse questions.csv.
+# ── состояние ─────────────────────────────────────────────
 
-    Expected format:
-        question,option1,option2,option3,option4
-        How do you spend evenings?,Reading,Movies,Going out,Gaming
+answers: dict[int, str] = {}   # {question_index: selected_option}
 
-    Any number of option columns (option1..optionN).
-    Extra empty cells are ignored.
-    """
-    if not QUESTIONS_CSV.exists():
-        return _default_questions()
+# ── рендер ────────────────────────────────────────────────
 
-    with open(QUESTIONS_CSV, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        questions = []
+def render_questions(questions: list[dict]) -> None:
+    scroll = document.getElementById("q-scroll")
+    scroll.innerHTML = ""
+
+    for i, q in enumerate(questions):
+        block = document.createElement("div")
+        block.className = "q-block anim"
+        block.style.animationDelay = f"{0.07 * i + 0.1}s"
+
+        title = document.createElement("div")
+        title.className   = "q-section-title"
+        title.textContent = q["question"]
+        block.appendChild(title)
+
+        opts_wrap = document.createElement("div")
+        opts_wrap.className = "q-options"
+
+        for opt in q["options"]:
+            btn = document.createElement("button")
+            btn.className   = "option-btn"
+            btn.textContent = opt
+
+            def make_handler(idx, value, container, el):
+                def handler(event):
+                    # снимаем выбор со всех вариантов этого вопроса
+                    all_opts = container.querySelectorAll(".option-btn")
+                    for j in range(all_opts.length):
+                        all_opts[j].classList.remove("selected")
+                    el.classList.add("selected")
+                    answers[idx] = value
+                return create_proxy(handler)
+
+            btn.addEventListener("click", make_handler(i, opt, opts_wrap, btn))
+            opts_wrap.appendChild(btn)
+
+        block.appendChild(opts_wrap)
+        scroll.appendChild(block)
+
+# ── загрузка CSV ───────────────────────────────────────────
+# Формат: question,option1,option2,option3,option4
+
+async def load_questions() -> None:
+    questions = []
+    try:
+        resp   = await fetch("questions.csv")
+        buf    = await resp.arrayBuffer()
+        text   = window.TextDecoder.new("utf-8").decode(buf)
+        reader = csv.DictReader(io.StringIO(text))
         for row in reader:
             q_text = row.get("question", "").strip()
             if not q_text:
@@ -46,97 +88,73 @@ def load_questions() -> list[dict]:
             ]
             if options:
                 questions.append({"question": q_text, "options": options})
-    return questions if questions else _default_questions()
+    except Exception:
+        questions = [
+            {
+                "question": "How do you prefer to spend your evenings?",
+                "options":  ["Reading a book", "Watching movies",
+                             "Going out with friends", "Playing video games"],
+            },
+            {
+                "question": "What kind of music do you enjoy most?",
+                "options":  ["Pop", "Rock / Metal", "Electronic / DJ", "Classical / Jazz"],
+            },
+            {
+                "question": "How active are you on a typical day?",
+                "options":  ["Very active – gym or sport daily",
+                             "Moderately active – walks",
+                             "Mostly sedentary – office work",
+                             "It varies a lot"],
+            },
+            {
+                "question": "What's your ideal vacation?",
+                "options":  ["Beach & relaxation", "City exploration",
+                             "Nature & hiking", "Road trip"],
+            },
+            {
+                "question": "How do you handle stressful situations?",
+                "options":  ["I talk to someone", "I take a walk or exercise",
+                             "I distract myself", "I prefer to be alone"],
+            },
+        ]
+    render_questions(questions)
 
+asyncio.ensure_future(load_questions())
 
-def _default_questions() -> list[dict]:
-    return [
-        {
-            "question": "How do you prefer to spend your evenings?",
-            "options": ["Reading a book", "Watching movies", "Going out with friends", "Playing video games"],
-        },
-        {
-            "question": "What kind of music do you enjoy most?",
-            "options": ["Pop", "Rock / Metal", "Electronic / DJ", "Classical / Jazz"],
-        },
-        {
-            "question": "How active are you on a typical day?",
-            "options": [
-                "Very active – gym or sport daily",
-                "Moderately active – walks & stretches",
-                "Mostly sedentary – office work",
-                "It varies a lot",
-            ],
-        },
-    ]
+# ── финализация профиля ────────────────────────────────────
 
+def finalize_user() -> None:
+    """Записывает полный профиль в localStorage["user:<username>"]."""
+    draft = _get_draft()
+    draft["answers"] = {str(k): v for k, v in answers.items()}
 
-# ── Finalize user profile ──────────────────────────────────────────────────────
+    username = draft.get("username", "")
+    if not username:
+        window.location.href = "signup.html"
+        return
 
-def finalize_profile(username: str, hobbies: list[str], answers: dict) -> bool:
-    """
-    Write hobbies and answers to the user's row in users.csv.
-    Hobbies → pipe-separated string.
-    Answers → JSON string.
-    Returns True on success.
-    """
-    users = _load_users()
-    found = False
-    for user in users:
-        if user["username"].lower() == username.lower():
-            user["hobbies"] = "|".join(hobbies) if hobbies else ""
-            user["answers"] = json.dumps(answers)
-            found = True
-            break
-    if found:
-        _save_users(users)
-    return found
+    # читаем уже сохранённую запись (с паролем) и обновляем её
+    key = f"user:{username.lower()}"
+    raw = localStorage.getItem(key)
+    if raw:
+        stored = json.loads(raw)
+        stored["hobbies"] = draft.get("hobbies", [])
+        stored["answers"] = draft["answers"]
+        localStorage.setItem(key, json.dumps(stored))
+    else:
+        # на случай если запись почему-то не сохранилась
+        localStorage.setItem(key, json.dumps(draft))
 
+    _save_draft(draft)   # обновляем черновик для dashboard
 
-# ── Request handler ────────────────────────────────────────────────────────────
+# ── навигация ─────────────────────────────────────────────
 
-def handle_request(method: str, body_bytes: bytes, cookie_header: str = "") -> dict:
-    if method == "GET":
-        return {"questions": load_questions()}
+def on_back(event=None):
+    window.location.href = "hobbies.html"
 
-    if method == "POST":
-        try:
-            body = json.loads(body_bytes)
-        except Exception:
-            return {"ok": False, "error": "Invalid JSON."}
+def on_continue(event=None):
+    finalize_user()
+    window.location.href = "dashboard.html"
 
-        # Auth: prefer session cookie, fall back to username in body (demo)
-        token = _extract_token(cookie_header)
-        username = get_session_user(token) if token else body.get("username", "").strip()
-
-        if not username:
-            return {"ok": False, "error": "Not authenticated."}
-
-        hobbies = body.get("hobbies", [])
-        answers = body.get("answers", {})
-
-        ok = finalize_profile(username, hobbies, answers)
-        if ok:
-            return {"ok": True, "redirect": "dashboard"}
-        return {"ok": False, "error": "User not found."}
-
-    return {"ok": False, "error": "Method not allowed."}
-
-
-def _extract_token(cookie_header: str) -> str | None:
-    if not cookie_header:
-        return None
-    for part in cookie_header.split(";"):
-        k, _, v = part.strip().partition("=")
-        if k.strip() == "session_token":
-            return v.strip()
-    return None
-
-
-# ── Standalone test ────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    qs = load_questions()
-    for i, q in enumerate(qs, 1):
-        print(f"Q{i}: {q['question']}")
-        for opt in q["options"]:
-            print(f"   • {opt}")
+document.getElementById("btn-back").addEventListener("click",     create_proxy(on_back))
+document.getElementById("btn-continue").addEventListener("click", create_proxy(on_continue))

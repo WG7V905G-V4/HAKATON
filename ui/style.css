@@ -4,189 +4,133 @@
 
 :root {
 
-  /* ════════════════════════════════════════════════════
-     LAYOUT
-     ════════════════════════════════════════════════════ */
-
   --sidebar-w:      52px;
   --panel-w:        390px;
-  --panel-px:       14px;   /* горизонтальный паддинг внутри узких панелей  */
+  --panel-px:       14px;
 
-  /* z-index слои */
   --z-map:      0;
   --z-gradient: 150;
   --z-panel:    200;
   --z-dropdown: 300;
   --z-sidebar:  500;
 
+  --c-surface:   rgba(255, 255, 255, 0.20);
+  --c-accent:    rgba(191, 202, 255, 0.80);
+  --c-deep:      rgba(0,   8,  116, 0.40);
+  --c-overlay:   rgba(255, 255, 255, 0.45);
+  --c-text:      rgba(255, 255, 255, 1.00);
+  --c-dark:      rgba(0,   0,   0,  0.10);
+  --c-muted:     rgba(255, 255, 255, 0.40);
+  --c-blue:      rgba(7,   49, 255, 0.20);
+  --c-btn:       rgba(0,   8,   92, 0.56);
+  --c-btn-hover: rgba(0,   8,   92, 0.80);
+  --c-dimmed:    rgba(255, 255, 255, 0.28);
 
-  /* ════════════════════════════════════════════════════
-     ЦВЕТА — базовая палитра
-     ════════════════════════════════════════════════════ */
-
-  --c-surface:   rgba(255, 255, 255, 0.20);  /* стекло: сайдбар, шапка, карточки  */
-  --c-accent:    rgba(191, 202, 255, 0.80);  /* акцент: выбранная карточка, кнопки */
-  --c-deep:      rgba(0,   8,  116, 0.40);   /* тёмно-синий фон                   */
-  --c-overlay:   rgba(255, 255, 255, 0.45);  /* границы / разделители             */
-  --c-text:      rgba(255, 255, 255, 1.00);  /* основной текст                    */
-  --c-dark:      rgba(0,   0,   0,  0.10);   /* тёмная подложка (participant bg)  */
-  --c-muted:     rgba(255, 255, 255, 0.40);  /* второстепенный текст              */
-  --c-blue:      rgba(7,   49, 255, 0.20);   /* синий hover на кнопках            */
-  --c-btn:       rgba(0,   8,   92, 0.56);   /* кнопки: join, active nav          */
-  --c-btn-hover: rgba(0,   8,   92, 0.80);   /* кнопка join при hover             */
-  --c-dimmed:    rgba(255, 255, 255, 0.28);  /* третьестепенный текст             */
-
-  /* алиасы — для совместимости и удобства */
   --glass-bg:     var(--c-surface);
   --glass-border: var(--c-overlay);
   --text:         var(--c-text);
   --muted:        var(--c-muted);
   --dimmed:       var(--c-dimmed);
 
-
-  /* ════════════════════════════════════════════════════
-     ЦВЕТА — компоненты
-     ════════════════════════════════════════════════════ */
-
-  /* Градиент за панелью */
   --c-gradient-start: rgba(0, 8, 116, 0.72);
   --c-gradient-mid:   rgba(0, 8, 116, 0.38);
   --c-gradient-end:   rgba(0, 8, 116, 0.00);
 
-  /* Полные панели (panel-2, 3, 4) */
   --c-panel-bg: rgba(0, 8, 116, 0.45);
 
-  /* Карточка мероприятия */
   --c-card-border:      rgba(255, 255, 255, 0.14);
   --c-card-dot:         rgba(255, 255, 255, 0.65);
   --c-card-dot-glow:    rgba(255, 255, 255, 0.55);
   --c-card-hover-bg:    rgba(191, 202, 255, 0.18);
   --c-card-selected-bg: rgba(191, 202, 255, 0.22);
 
-  /* Тени */
   --shadow-card-hover:    rgba(0, 0, 0, 0.14);
   --shadow-card-selected: rgba(0, 0, 0, 0.20);
   --shadow-nav-active:    rgba(0, 0, 0, 0.18);
 
-  /* Текст декоративных панелей */
   --c-panel-tag:  rgba(255, 255, 255, 0.38);
   --c-panel-deco: rgba(255, 255, 255, 0.35);
   --c-panel-text: rgba(255, 255, 255, 0.42);
 
-  /* Инпуты и чипы фильтров */
   --c-input-bg:           rgba(255, 255, 255, 0.10);
   --c-input-bg-focus:     rgba(255, 255, 255, 0.16);
   --c-input-border:       rgba(255, 255, 255, 0.14);
   --c-input-border-focus: rgba(255, 255, 255, 0.28);
 
-  /* Шапка панели */
   --c-header-border: rgba(255, 255, 255, 0.10);
 
-  /* Скроллбар */
   --c-scrollbar: rgba(255, 255, 255, 0.15);
 
-  /* Попап Leaflet */
   --c-popup-bg:    rgba(255, 255, 255, 0.88);
   --c-popup-text:  #1a1a2e;
   --c-popup-close: #888888;
 
-  /* Подсветка nav-кнопки */
   --c-nav-active-inset: rgba(255, 255, 255, 0.12);
 
-  /* Подсказки формы */
   --c-hint-default: rgba(255, 255, 255, 0.45);
   --c-success:      #7dffb3;
   --c-error:        #ff7d9d;
 
+  --glass-blur:       20px;
+  --glass-blur-card:  12px;
+  --glass-blur-panel: 24px;
 
-  /* ════════════════════════════════════════════════════
-     РАЗМЫТИЕ
-     ════════════════════════════════════════════════════ */
-
-  --glass-blur:       20px;  /* сайдбар, шапка, дропдаун       */
-  --glass-blur-card:  12px;  /* карточки, попап Leaflet         */
-  --glass-blur-panel: 24px;  /* полные панели (panel-2, 3, 4)  */
-
-
-  /* ════════════════════════════════════════════════════
-     СКРУГЛЕНИЯ
-     ════════════════════════════════════════════════════ */
-
-  --radius-card:        16px;  /* карточка события               */
-  --radius-panel:       12px;  /* дропдаун, попап, инпуты формы  */
-  --radius-pill:        20px;  /* search-input, btn-join, чипы   */
-  --radius-chip-inner:   8px;  /* чипы внутри дропдауна          */
-  --radius-participant: 24px;  /* строка участника               */
-  --radius-nav-btn:     10px;  /* кнопки навигации               */
-  --radius-nav-btn-mob: 14px;  /* кнопки навигации на мобилке    */
-  --radius-scrollbar:    2px;  /* ползунок скроллбара            */
-  --radius-deco:         1px;  /* декоративная линия панели      */
-
-
-  /* ════════════════════════════════════════════════════
-     ТИПОГРАФИКА
-     ════════════════════════════════════════════════════ */
+  --radius-card:        16px;
+  --radius-panel:       12px;
+  --radius-pill:        20px;
+  --radius-chip-inner:   8px;
+  --radius-participant: 24px;
+  --radius-nav-btn:     10px;
+  --radius-nav-btn-mob: 14px;
+  --radius-scrollbar:    2px;
+  --radius-deco:         1px;
 
   --font-base: 'Inter', sans-serif;
 
-  --font-size-xs: 11px;  /* метки форм, desc, hint, filter-chip */
-  --font-size-sm: 12px;  /* мета карточки, author, search       */
-  --font-size-md: 13px;  /* participant, btn-join               */
-  --font-size-lg: 14px;  /* panel-text                          */
-  --font-size-xl: 18px;  /* заголовок карточки, create-title    */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 18px;
 
   --font-weight-normal:   400;
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
   --font-weight-bold:     700;
 
-
-  /* ════════════════════════════════════════════════════
-     АНИМАЦИИ
-     ════════════════════════════════════════════════════ */
-
   --ease-slide:  cubic-bezier(0.77, 0, 0.18, 1);
   --ease-expand: cubic-bezier(0.34, 1.06, 0.64, 1);
 
-  --dur:      0.5s;   /* основные переходы панелей */
-  --dur-fast: 0.2s;   /* hover, цвет, фон          */
-  --dur-med:  0.35s;  /* opacity карточек          */
-  --dur-slow: 0.6s;   /* декоративная линия        */
-
-
-  /* ════════════════════════════════════════════════════
-     РАЗМЕРЫ КОМПОНЕНТОВ
-     ════════════════════════════════════════════════════ */
+  --dur:      0.5s;
+  --dur-fast: 0.2s;
+  --dur-med:  0.35s;
+  --dur-slow: 0.6s;
 
   --scrollbar-w: 3px;
 
   --nav-btn-size:     36px;
   --nav-btn-size-mob: 48px;
 
-  /* паддинг основного контента карточки */
   --card-pad-top:    16px;
   --card-pad-x:      18px;
   --card-pad-bottom: 14px;
 
-  /* паддинг списков (event-list и create-form совпадают) */
   --list-pad-top:    16px;
   --list-pad-bottom: 24px;
 
-  --expandable-pad-x:     18px;  /* горизонтальный паддинг expandable     */
+  --expandable-pad-x:        18px;
   --participant-avatar-size: 24px;
   --card-dot-size:            8px;
 
-  /* декоративная линия панели */
   --deco-w-open: 44px;
   --deco-h:       2px;
 
-  /* паддинг широких текстовых панелей */
   --panel-full-py: 72px;
   --panel-full-px: 64px;
 
   --textarea-h: 72px;
 
-  --panel-header-h: 94px;  /* высота шапки panel-1 — event-list отступает на неё сверху */
+  --panel-header-h: 94px;
 }
 
 
@@ -201,13 +145,9 @@ html, body {
   color: var(--text);
 }
 
-
-/* ── Карта ────────────────────────────────────────────── */
 #map { position: fixed; inset: 0; z-index: var(--z-map); }
 .leaflet-container { outline: none; }
 
-
-/* ── Градиент ─────────────────────────────────────────── */
 body::after {
   content: '';
   position: fixed;
@@ -298,6 +238,7 @@ body.panel-1-open::after {
   left: var(--sidebar-w);
   height: 100vh;
   width: calc(100vw - var(--sidebar-w));
+  max-width: 70%;
   transform: translateX(-100%);
   transition: transform var(--dur) var(--ease-slide);
   z-index: var(--z-panel);
@@ -322,9 +263,17 @@ body.panel-1-open::after {
   border-right: 1px solid var(--glass-border);
 }
 
-/* ── Panel inner ──────────────────────────────────────── */
+#panel-3 {
+  padding: 20px;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  align-items: center;
+}
+
 .panel-inner {
-  /* position:relative убран — якорь для шапки больше не нужен, шапка прямой дочерний .panel */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -335,7 +284,6 @@ body.panel-1-open::after {
   height: 100%;
 }
 .panel.open .panel-inner { opacity: 1; transform: translateX(0); }
-
 
 .panel-inner--full {
   padding: var(--panel-full-py) var(--panel-full-px);
@@ -356,7 +304,6 @@ body.panel-1-open::after {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  /* сверху — место под плавающую шапку; низ и бока — стандарт */
   padding: calc(var(--panel-header-h) + var(--list-pad-top))
            var(--panel-px)
            var(--list-pad-bottom)
@@ -392,14 +339,12 @@ body.panel-1-open::after {
   overflow: visible;
 }
 
-/* stagger появления */
 .panel.open .event-card:nth-child(1) { opacity:1; transform:none; transition-delay: .08s; }
 .panel.open .event-card:nth-child(2) { opacity:1; transform:none; transition-delay: .15s; }
 .panel.open .event-card:nth-child(3) { opacity:1; transform:none; transition-delay: .22s; }
 .panel.open .event-card:nth-child(4) { opacity:1; transform:none; transition-delay: .29s; }
 .panel.open .event-card:nth-child(5) { opacity:1; transform:none; transition-delay: .36s; }
 
-/* ── HOVER ────────────────────────────────────────────── */
 .event-card:hover {
   background: var(--c-card-hover-bg);
   border-color: var(--c-overlay);
@@ -411,7 +356,6 @@ body.panel-1-open::after {
   opacity: 0.5;
 }
 
-/* ── SELECTED ─────────────────────────────────────────── */
 .event-card.selected {
   background: var(--c-card-selected-bg);
   border-color: var(--c-accent);
@@ -427,7 +371,6 @@ body.panel-1-open::after {
   box-shadow: 0 0 6px var(--c-card-dot-glow);
 }
 
-/* ── Основной контент ─────────────────────────────────── */
 .event-main {
   padding: var(--card-pad-top) var(--card-pad-x) var(--card-pad-bottom) var(--card-pad-x);
 }
@@ -472,7 +415,6 @@ body.panel-1-open::after {
 .event-time  { font-size: var(--font-size-sm); color: var(--muted); font-weight: var(--font-weight-medium); }
 .event-place { font-size: var(--font-size-sm); color: var(--dimmed); }
 
-/* ── Разворачиваемый блок ─────────────────────────────── */
 .event-expandable {
   max-height: 0;
   opacity: 0;
@@ -495,7 +437,6 @@ body.panel-1-open::after {
   margin-top: 2px;
 }
 
-/* ── Участники ────────────────────────────────────────── */
 .event-participants {
   display: flex;
   flex-direction: column;
@@ -529,7 +470,6 @@ body.panel-1-open::after {
   color: var(--c-text);
 }
 
-/* ── Кнопка join ──────────────────────────────────────── */
 .btn-join {
   background: var(--c-btn);
   color: var(--c-text);
@@ -602,12 +542,9 @@ body.panel-1-open::after {
 
 
 /* ════════════════════════════════════════════════════════
-   ШАПКА ПАНЕЛИ: поиск + фильтры
+   ШАПКА ПАНЕЛИ
    ════════════════════════════════════════════════════════ */
 
-/* высота шапки — задаётся здесь, event-list отступает на неё */
-
-/* базовый стиль шапки — общий для panel-1 и panel-4 */
 .panel-header {
   display: flex;
   flex-direction: column;
@@ -618,15 +555,12 @@ body.panel-1-open::after {
   -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
-/* panel-1: шапка плавает поверх списка карточек */
 #panel-1 .panel-header {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 10;
-
-  /* та же анимация появления, что у panel-inner */
   opacity: 0;
   transform: translateX(-20px);
   transition: opacity .4s .12s ease, transform .4s .1s var(--ease-slide);
@@ -637,7 +571,6 @@ body.panel-1-open::after {
   transform: translateX(0);
 }
 
-/* градиентная тень под шапкой panel-1 */
 #panel-1 .panel-header::after {
   content: '';
   position: absolute;
@@ -653,13 +586,11 @@ body.panel-1-open::after {
   );
 }
 
-/* panel-4: шапка обычная flow, flex-shrink чтобы форма скроллилась */
 #panel-4 .panel-header {
   flex-shrink: 0;
   border-bottom: 1px solid var(--c-header-border);
 }
 
-/* ── Поиск ───────────────────────────────────────────── */
 .search-wrap {
   position: relative;
   display: flex;
@@ -692,7 +623,6 @@ body.panel-1-open::after {
   border-color: var(--c-input-border-focus);
 }
 
-/* ── Фильтры ─────────────────────────────────────────── */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -725,7 +655,6 @@ body.panel-1-open::after {
   color: var(--c-text);
 }
 
-/* ── Дропдаун фильтров ───────────────────────────────── */
 .filter-dropdown-wrap {
   position: relative;
 }
@@ -761,7 +690,7 @@ body.panel-1-open::after {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 20;  /* выше panel-header (z-index:10) */
+  z-index: 20;
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -795,17 +724,13 @@ body.panel-1-open::after {
     --sidebar-w:    0px;
     --panel-w:      100vw;
     --mobile-nav-h: 64px;
-
     --nav-btn-size:   var(--nav-btn-size-mob);
     --radius-nav-btn: var(--radius-nav-btn-mob);
-
     --panel-full-py: 40px;
     --panel-full-px: 28px;
   }
 
-  #map {
-    inset: 0 0 var(--mobile-nav-h) 0;
-  }
+  #map { inset: 0 0 var(--mobile-nav-h) 0; }
 
   .sidebar {
     inset: auto 0 0 0;
@@ -848,7 +773,6 @@ body.panel-1-open::after {
 
   .event-title  { font-size: 20px; }
   .event-author { font-size: var(--font-size-md); }
-
   .create-field--row { flex-direction: column; }
 }
 
@@ -940,3 +864,515 @@ body.panel-1-open::after {
 }
 .create-hint.success { color: var(--c-success); }
 .create-hint.error   { color: var(--c-error); }
+
+.sidebar-fire { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-bottom: 22px; color: var(--white); }
+.fire-count { font-size: 14px; font-weight: 800; }
+.nav-pills { display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 0 8px; margin-bottom: 20px; }
+.nav-pill {
+    padding: 7px 8px; border-radius: 45px;
+    font-size: 11px; font-weight: 700; color: var(--white);
+    cursor: pointer; background: transparent;
+    transition: background 0.2s; text-align: center; user-select: none;
+}
+.nav-pill:hover { background: rgba(255,255,255,0.16); }
+.nav-pill.active { background: var(--secondary); }
+.sidebar-spacer { flex: 1; }
+.sidebar-icons { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.sidebar-icon { opacity: 0.65; cursor: pointer; transition: opacity 0.18s; }
+.sidebar-icon:hover { opacity: 1; }
+.sidebar-icon svg { width: 22px; height: 22px; display: block; }
+
+.main {
+    flex: 1; min-width: 0; height: 100vh;
+    overflow-y: scroll; overflow-x: hidden;
+    padding: 16px 24px 48px 10px;
+}
+.main::-webkit-scrollbar { width: 5px; }
+.main::-webkit-scrollbar-track { background: transparent; }
+.main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); border-radius: 3px; }
+
+.content-card {
+    background: rgba(90,96,145,0.60);
+    backdrop-filter: blur(12px);
+    border-radius: 45px;
+    padding: 24px 30px 40px;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    min-height: calc(100vh - 32px);
+}
+.block {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+.profile-header {
+    display: flex; align-items: center; gap: 18px;
+    padding: 6px 4px; width: 100%; max-width: 560px;
+}
+.avatar { width: 100px; height: 100px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #2a2a3a; }
+.avatar svg { width: 100%; height: 100%; }
+.profile-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.profile-name { font-size: 64px; font-weight: 800; color: var(--white); line-height: 1; }
+.profile-count { font-size: 20px; font-weight: 800; color: var(--white); display: flex; align-items: center; gap: 6px; }
+
+.description-wrap { display: flex; flex-direction: column; gap: 2px; }
+.description-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 4px; }
+.description-box {
+    background: rgba(255,255,255,0.72); border-radius: 16px;
+    padding: 10px 20px; color: var(--text-dark);
+    font-size: 17px; font-weight: 700; text-align: center;
+    cursor: text; outline: none; min-height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.18s, box-shadow 0.18s;
+    font-family: 'Inter', sans-serif;
+}
+.description-box:focus { background: rgba(255,255,255,0.90); box-shadow: 0 0 0 2px rgba(107,114,196,0.6); }
+.description-box:empty::before {
+    content: 'Write something about yourself…';
+    color: rgba(90,96,144,0.45); font-weight: 400; pointer-events: none;
+}
+
+.section-title {
+    font-size: 40px; font-weight: 900; color: var(--white);
+    text-align: center; width: 100%; max-width: 560px;
+}
+
+.hobbies-grid-wrap { background: rgba(255,255,255,0.10); border-radius: 16px; padding: 18px 16px; }
+.hobbies-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.hobby-tag {
+    position: relative; background: var(--tag-fill);
+    border-radius: 22px; height: 37px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,17,0.25); overflow: visible;
+}
+.tag-x {
+    position: absolute; top: -6px; right: -6px;
+    width: 16px; height: 16px; background: rgba(255,255,255,0.35);
+    border-radius: 50%; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.9); cursor: pointer; transition: background 0.15s;
+}
+.tag-x:hover { background: rgba(220,60,60,0.75); }
+
+.friends-card {
+    background: rgba(255,255,255,0.18); border-radius: 16px;
+    padding: 10px 20px; max-height: 200px;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+}
+.friends-card::-webkit-scrollbar { width: 4px; }
+.friends-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.35); border-radius: 2px; }
+.friend-row {
+    display: flex; align-items: center; background: var(--friend-bg);
+    border-radius: 10px; padding: 5px 6px 5px 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12); gap: 8px; min-height: 33px; flex-shrink: 0;
+}
+.friend-name { flex: 1; font-size: 14px; font-weight: 600; color: #7a80b8; }
+.btn-visit {
+    background: var(--secondary); border: none; border-radius: 50px;
+    min-width: 86px; height: 23px; font-size: 13px; font-weight: 700;
+    color: #fff; cursor: pointer; font-family: inherit; transition: opacity 0.18s;
+}
+.btn-visit:hover { opacity: 0.82; }
+
+.activities-card {
+    background: rgba(255,255,255,0.10); border-radius: 16px;
+    padding: 16px; max-height: 260px;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+}
+.activities-card::-webkit-scrollbar { width: 4px; }
+.activities-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+.activity-row {
+    background: rgba(255,255,255,0.14); border-radius: 12px;
+    padding: 10px 12px 10px 14px;
+    display: flex; align-items: center; gap: 12px;
+    backdrop-filter: blur(4px); flex-shrink: 0;
+}
+.activity-dots { display: flex; gap: 3px; margin-bottom: 4px; }
+.activity-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--secondary); }
+.activity-info { flex: 1; }
+.activity-creator { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5); }
+.activity-name { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.92); margin-top: 1px; }
+.activity-meta { font-size: 10px; color: rgba(255,255,255,0.48); margin-top: 2px; line-height: 1.5; }
+.btn-cancel {
+    background: var(--secondary); border: none; color: #fff;
+    border-radius: 50px; min-width: 93px; height: 34px;
+    font-size: 13px; font-weight: 800; cursor: pointer;
+    font-family: inherit; transition: opacity 0.18s, transform 0.18s; white-space: nowrap;
+}
+.btn-cancel:hover { opacity: 0.82; }
+.btn-cancel:active { transform: scale(0.96); }
+
+.creators-card { background: rgba(255,255,255,0.10); border-radius: 16px; min-height: 140px; }
+
+.avatar-wrap {
+    position: relative; flex-shrink: 0;
+    width: 100px; height: 100px;
+}
+.avatar-wrap .avatar { width: 100px; height: 100px; }
+.avatar-edit-btn {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--secondary);
+    border: 2px solid rgba(255,255,255,0.85);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    transition: transform 0.18s, background 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.28); color: #fff;
+}
+.avatar-edit-btn:hover { transform: scale(1.12); background: #5058b0; }
+.avatar-edit-btn svg { width: 13px; height: 13px; display: block; }
+
+.profile-name[contenteditable="true"] {
+    outline: none;
+    border-bottom: 2px solid rgba(255,255,255,0.55);
+    padding-bottom: 2px; cursor: text;
+}
+.name-wrap { position: relative; display: inline-flex; align-items: flex-start; }
+.name-edit-btn {
+    position: absolute; top: -2px; right: -22px;
+    width: 16px; height: 16px;
+    background: none; border: none; padding: 0; cursor: pointer;
+    color: rgba(255,255,255,0.45);
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.18s, transform 0.18s;
+}
+.name-edit-btn:hover { color: rgba(255,255,255,0.9); transform: scale(1.15); }
+.name-edit-btn svg { width: 14px; height: 14px; display: block; }
+.name-edit-btn.active { color: #6ddd9e; }
+
+.creators-card {
+    background: rgba(255,255,255,0.10);
+    border-radius: 16px; padding: 20px 16px;
+}
+.creators-grid {
+    display: flex; justify-content: space-around;
+    align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.creator-item { display: flex; flex-direction: column; align-items: center; }
+.creator-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    overflow: hidden; position: relative; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.25);
+    transition: border-color 0.2s, transform 0.2s; flex-shrink: 0;
+}
+.creator-circle svg { width: 100%; height: 100%; display: block; }
+.creator-circle:hover { border-color: rgba(255,255,255,0.65); transform: scale(1.06); }
+.creator-overlay {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(30,30,60,0.0);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.22s;
+}
+.creator-circle:hover .creator-overlay { background: rgba(20,20,50,0.60); }
+.creator-name {
+    color: rgba(255,255,255,0); font-size: 12px; font-weight: 700;
+    text-align: center; transition: color 0.22s;
+    user-select: none; letter-spacing: 0.3px;
+}
+.creator-circle:hover .creator-name { color: rgba(255,255,255,0.95); }
+.creators-tagline {
+    text-align: center; font-size: 12px; font-weight: 500;
+    color: rgba(255,255,255,0.28); margin-top: 14px; letter-spacing: 0.5px;
+}
+
+.modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    backdrop-filter: blur(14px); background: rgba(40,42,80,0.45);
+    align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.friend-modal {
+    width: 520px; max-width: 95vw; max-height: 82vh;
+    background: rgba(90,96,145,0.72); backdrop-filter: blur(18px);
+    border-radius: 36px; padding: 28px 28px 36px;
+    overflow-y: auto; position: relative;
+    display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    animation: modalIn 0.28s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.friend-modal::-webkit-scrollbar { width: 4px; }
+.friend-modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }
+.modal-close {
+    position: absolute; top: 16px; right: 20px;
+    width: 32px; height: 32px; background: none; border: none;
+    color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.18s, transform 0.18s; line-height: 1; padding: 0;
+}
+.modal-close:hover { color: rgba(255,255,255,1); transform: scale(1.15); }
+.modal-profile-header { display: flex; align-items: center; gap: 16px; padding: 4px 0; }
+.modal-avatar { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: #2a2a3a; }
+.modal-avatar svg { width: 100%; height: 100%; }
+.modal-profile-name { font-size: 42px; font-weight: 800; color: #fff; line-height: 1; }
+.modal-fire-row { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 800; color: #fff; margin-top: 4px; }
+.modal-desc { background: rgba(255,255,255,0.72); border-radius: 14px; padding: 9px 18px; color: #5a6090; font-size: 15px; font-weight: 700; text-align: center; }
+.modal-section-title { font-size: 28px; font-weight: 900; color: #fff; text-align: center; }
+.modal-hobbies-wrap { background: rgba(255,255,255,0.10); border-radius: 14px; padding: 14px; }
+.modal-hobbies-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.modal-hobby-tag {
+    background: rgba(0,17,255,0.28); border-radius: 20px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,17,0.2);
+}
+.modal-activities-card {
+    background: rgba(255,255,255,0.10); border-radius: 14px;
+    padding: 12px; display: flex; flex-direction: column; gap: 9px;
+    max-height: 220px; overflow-y: auto;
+}
+.modal-activities-card::-webkit-scrollbar { width: 3px; }
+.modal-activities-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }
+.modal-activity-row { background: rgba(255,255,255,0.13); border-radius: 10px; padding: 9px 12px; display: flex; flex-direction: column; gap: 2px; }
+.modal-activity-name { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.92); }
+.modal-activity-meta { font-size: 10px; color: rgba(255,255,255,0.48); line-height: 1.5; }
+
+.desc-edit-btn {
+    background: none; border: none; padding: 0; cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.18s, transform 0.18s; width: 14px; height: 14px;
+}
+.desc-edit-btn:hover { color: rgba(255,255,255,0.85); transform: scale(1.15); }
+.desc-edit-btn.active { color: #6ddd9e; }
+.desc-edit-btn svg { width: 13px; height: 13px; display: block; }
+#desc-box[contenteditable="true"] {
+    cursor: text; box-shadow: 0 0 0 2px rgba(107,114,196,0.6);
+    background: rgba(255,255,255,0.90);
+}
+
+
+/* ════════════════════════════════════════════════════════
+   PANEL-2: ЧАТ
+   ════════════════════════════════════════════════════════ */
+
+.chat-panel-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+
+.chat-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.chat-header .panel-title { margin: 4px 0 0; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-messages::-webkit-scrollbar { width: var(--scrollbar-w); }
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--c-scrollbar);
+  border-radius: var(--radius-scrollbar);
+}
+
+.chat-msg {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 85%;
+  word-break: break-word;
+}
+.chat-msg--user {
+  align-self: flex-end;
+  background: #7c6af7;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg--bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--c-text);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-input-area {
+  padding: 10px 16px 16px;  /* ↓ было 12px 20px 20px — чуть компактнее */
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-textarea {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--c-text);
+  font-size: 14px;
+  font-family: var(--font-base);
+  resize: none;
+  outline: none;
+  line-height: 1.4;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.chat-textarea::placeholder { color: var(--c-muted); }
+
+.chat-send-btn {
+  background: #7c6af7;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  height: 40px;
+  transition: background var(--dur-fast), transform .15s;
+}
+.chat-send-btn:hover { background: #6a59e0; transform: scale(1.05); }
+
+/* ── Кнопка завершения — меньше, текст ярче ──────────── */
+.chat-end-btn {
+  margin-top: 6px;           /* ↓ было 8px */
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;        /* ↓ было 10px */
+  padding: 5px 10px;         /* ↓ было 8px — меньше по высоте */
+  color: rgba(255, 255, 255, 0.70);  /* ↑ было 0.50 — ярче */
+  font-size: 11px;           /* ↓ было 12px */
+  font-family: var(--font-base);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.chat-end-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.90);  /* ↑ было 0.75 */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   CHAT SESSIONS SIDEBAR
+   ════════════════════════════════════════════════════════ */
+
+.chat-sessions-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow: hidden;
+}
+
+.chat-sessions-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.30);
+  padding: 0 14px 12px;
+}
+
+.chat-sessions-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+}
+.chat-sessions-list::-webkit-scrollbar { width: 2px; }
+.chat-sessions-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
+.chat-session-item {
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+  border-left: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  overflow: hidden;
+}
+.chat-session-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.chat-session-item.active {
+  background: rgba(124, 106, 247, 0.15);
+  border-left-color: #7c6af7;
+}
+
+/* дата — крупнее и ярче, это главное */
+.chat-session-item .session-date {
+  font-size: 12px;           /* ↑ было 10px */
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);   /* ↑ было 0.25 */
+  line-height: 1.2;
+}
+.chat-session-item.active .session-date {
+  color: rgba(255, 255, 255, 1.00);
+}
+
+/* итог/статус — мельче и тише */
+.session-summary {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.30);   /* тихий, вторичный */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.chat-session-item.active .session-summary {
+  color: rgba(255, 255, 255, 0.50);
+}
+
+/* ── Chat main area ───────────────────────────────────── */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Разделитель сессий — только дата, без полос ─────── */
+.chat-session-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;   /* ↑ центрируем, полос нет */
+  padding: 12px 0 4px;
+  margin: 4px 0;
+  scroll-margin-top: 8px;
+}
+
+/* убираем псевдоэлементы с полосами */
+.chat-session-divider::before,
+.chat-session-divider::after {
+  display: none;
+}
+
+.chat-session-divider-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.06em;
+}

@@ -1,0 +1,112 @@
+/* ════════════════════════════════════════════════════════
+   AI SETTINGS BLOCK (panel-3)
+   ════════════════════════════════════════════════════════ */
+
+.ai-settings-block {
+  margin-top: 8px;
+}
+
+.ai-settings-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-settings-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.01em;
+}
+
+.ai-settings-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.6;
+}
+
+.ai-prompt-textarea {
+  width: 100%;
+  min-height: 100px;
+  max-height: 200px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+}
+
+.ai-prompt-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.ai-prompt-textarea:focus {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(124, 106, 247, 0.55);
+}
+
+.ai-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-prompt-counter {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-save-btn {
+  background: rgba(124, 106, 247, 0.75);
+  border: none;
+  border-radius: 50px;
+  padding: 7px 22px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.ai-save-btn:hover {
+  background: rgba(124, 106, 247, 1.00);
+  transform: scale(1.04);
+}
+
+.ai-save-btn:active {
+  transform: scale(0.97);
+}
+
+.ai-save-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.ai-save-status {
+  font-size: 11px;
+  min-height: 16px;
+  transition: color 0.2s;
+  text-align: right;
+}
+
+.ai-save-status.success {
+  color: #7dffb3;
+}
+
+.ai-save-status.error {
+  color: #ff7d9d;
+}
