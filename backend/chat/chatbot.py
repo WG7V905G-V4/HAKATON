@@ -166,20 +166,21 @@ def _clean_conclusion(text: str) -> str:
     return result.strip()
 
 
+from openai import OpenAI
+
 def _get_client_and_model():
     api_key = getattr(settings, 'HF_API_KEY', '') or os.getenv('HF_API_KEY', '')
-    model = getattr(settings, 'HF_MODEL', '') or os.getenv('HF_MODEL', 'deepseek-ai/DeepSeek-R1')
+    model = getattr(settings, 'HF_MODEL', '') or os.getenv('HF_MODEL', 'llama-3.3-70b-versatile')
     return api_key, model
-
 
 def get_ai_response(db_messages, current_session_id=None, custom_prompt=None) -> str:
     api_key, model = _get_client_and_model()
 
-    if not api_key or api_key.startswith('hf_YOUR'):
-        return "HuggingFace API key is not set. Add your key to HF_API_KEY."
-
     try:
-        client = InferenceClient(api_key=api_key)
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
         completion = client.chat.completions.create(
             model=model,
             messages=_build_messages(
@@ -191,7 +192,7 @@ def get_ai_response(db_messages, current_session_id=None, custom_prompt=None) ->
             temperature=0.75,
         )
         text = completion.choices[0].message.content.strip()
-        return text or "I'm here — just give me a moment… Please try writing again."
+        return text or "I'm here — just give me a moment…"
     except Exception as e:
         return f"Connection/model error: {e}"
 
@@ -199,11 +200,11 @@ def get_ai_response(db_messages, current_session_id=None, custom_prompt=None) ->
 def get_conclusion(db_messages, current_session_id=None, custom_prompt=None) -> str:
     api_key, model = _get_client_and_model()
 
-    if not api_key or api_key.startswith('hf_YOUR'):
-        return "HuggingFace API key is not set. Add your key to HF_API_KEY."
-
     try:
-        client = InferenceClient(api_key=api_key)
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
         completion = client.chat.completions.create(
             model=model,
             messages=_build_messages(
@@ -219,7 +220,6 @@ def get_conclusion(db_messages, current_session_id=None, custom_prompt=None) -> 
         return _clean_conclusion(text) if text else "Could not generate session summary."
     except Exception as e:
         return f"Connection/model error: {e}"
-
 
 def get_session_for_display(session_id: int) -> str:
     """

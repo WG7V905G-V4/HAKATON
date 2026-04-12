@@ -1376,3 +1376,14 @@ body.panel-1-open::after {
   color: rgba(255, 255, 255, 0.35);
   letter-spacing: 0.06em;
 }
+
+
+.chat-msg--summary {
+  background: rgba(124, 106, 247, 0.12);
+  border: 1px solid rgba(124, 106, 247, 0.30);
+  border-left: 3px solid #7c6af7;
+  border-bottom-left-radius: 4px;
+  max-width: 100%;
+  font-size: 13px;
+  line-height: 1.7;
+}

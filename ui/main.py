@@ -470,18 +470,28 @@ document.getElementById("btn-create").addEventListener("click", create_proxy(on_
 
 
 
-
 # ── Чат ──────────────────────────────────────────────────
-import json as pyjson
 
 chat_session_id = [None]
-all_sessions = []  # список всех сессий
+all_sessions = []
 
-def add_message(text, role, anchor_id=None):
+def add_message(text, role, anchor_id=None, is_summary=False):
     messages_el = document.getElementById("chat-messages")
     div = document.createElement("div")
-    div.className = "chat-msg chat-msg--" + ("user" if role == "user" else "bot")
-    div.textContent = text
+    cls = "chat-msg chat-msg--" + ("user" if role == "user" else "bot")
+    if is_summary:
+        cls += " chat-msg--summary"
+    div.className = cls
+
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if line.strip():
+            span = document.createElement("span")
+            span.textContent = line
+            div.appendChild(span)
+        if i < len(lines) - 1:
+            div.appendChild(document.createElement("br"))
+
     if anchor_id:
         div.id = anchor_id
     messages_el.appendChild(div)
@@ -516,7 +526,8 @@ def render_sessions_sidebar():
     sidebar = document.getElementById("chat-sessions-list")
     sidebar.innerHTML = ""
 
-    for s in all_sessions:
+
+    for s in reversed(all_sessions):
         item = document.createElement("div")
         item.className = "chat-session-item" + (" active" if s["id"] == chat_session_id[0] else "")
         item.setAttribute("data-sid", str(s["id"]))
@@ -526,28 +537,23 @@ def render_sessions_sidebar():
         date_div.textContent = s.get("date", "—")
         item.appendChild(date_div)
 
-        summary_div = document.createElement("div")
-        summary_div.className = "session-summary"
-        if s.get("concluded"):
-            summary_div.textContent = s.get("title", "Итог...")
-        else:
-            summary_div.textContent = "В процессе..."
-        item.appendChild(summary_div)
+        title_div = document.createElement("div")
+        title_div.textContent = s.get("title", f"Диалог {s['id']}")
+        item.appendChild(title_div)
 
         sid = s["id"]
-        item.addEventListener("click", create_proxy(make_session_click(sid)))
+        concluded = s.get("concluded", False)
+        item.addEventListener("click", create_proxy(make_session_click(sid, concluded)))
         sidebar.appendChild(item)
-    # кнопки нет
 
-def make_session_click(sid):
+def make_session_click(sid, concluded):
     def handler(e):
         anchor = document.getElementById(f"session-anchor-{sid}")
         if anchor:
-            scroll_opts = js.Object.new()
-            scroll_opts.behavior = "smooth"
-            scroll_opts.block = "start"
-            anchor.scrollIntoView(scroll_opts)
-        chat_session_id[0] = sid
+            anchor.scrollIntoView(to_js({"behavior": "smooth", "block": "start"}))
+        # переключаем активную только если не завершена
+        if not concluded:
+            chat_session_id[0] = sid
         items = document.querySelectorAll(".chat-session-item")
         for i in range(items.length):
             items[i].classList.remove("active")
@@ -555,29 +561,7 @@ def make_session_click(sid):
                 items[i].classList.add("active")
     return handler
 
-async def load_all_sessions():
-    try:
-        resp = await js.fetch("/chat/api/sessions/")
-        data_text = await resp.text()
-        data = js.JSON.parse(data_text)
-        sessions_js = data.sessions
-        all_sessions.clear()
-        for i in range(sessions_js.length):
-            s = sessions_js[i]
-            sid = s.id
-            created = str(s.created_at)[:10] if hasattr(s, "created_at") else ""
-            concluded = s.concluded if hasattr(s, "concluded") else False
-            all_sessions.append({
-                "id": sid,
-                "title": "Итог сессии" if concluded else f"Диалог {sid}",
-                "date": created,
-                "concluded": concluded,
-            })
-        render_sessions_sidebar()
-    except Exception as e:
-        pass
-
-async def load_session_messages(sid):
+async def load_session_messages(sid, is_concluded=False):
     try:
         resp = await js.fetch(f"/chat/api/sessions/{sid}/")
         data_text = await resp.text()
@@ -585,19 +569,23 @@ async def load_session_messages(sid):
         messages_js = data.messages
         for i in range(messages_js.length):
             m = messages_js[i]
-            add_message(m.content, m.role)
+            # последнее сообщение ассистента в завершённой сессии — summary
+            is_last = (i == messages_js.length - 1)
+            is_sum = is_concluded and m.role == "assistant" and is_last
+            add_message(m.content, m.role, is_summary=is_sum)
     except Exception as e:
         pass
 
 async def load_all_history():
     messages_el = document.getElementById("chat-messages")
     messages_el.innerHTML = ""
-
     for s in all_sessions:
         sid = s["id"]
-        add_session_divider(sid, s["title"] + ("  ✓" if s.get("concluded") else ""))
-        await load_session_messages(sid)
-
+        label = s.get("date", f"Диалог {sid}")
+        if s.get("concluded"):
+            label += " ✓"
+        add_session_divider(sid, label)
+        await load_session_messages(sid, is_concluded=s.get("concluded", False))
     messages_el = document.getElementById("chat-messages")
     messages_el.scrollTop = messages_el.scrollHeight
 
@@ -613,26 +601,33 @@ async def create_session():
     sid = data.session.id
     chat_session_id[0] = sid
 
-    # ↓ было: title = f"Диалог {sid}", date = ""
     today = js.Date.new().toLocaleDateString("ru-RU")
-
     all_sessions.append({
         "id": sid,
-        "title": f"Диалог {sid}",
+        "title": "Новый диалог",
         "date": today,
         "concluded": False,
     })
 
-    # ↓ было: add_session_divider(sid, f"Диалог {sid}")
     add_session_divider(sid, today)
     add_message("Привет! Как ты себя чувствуешь сегодня?", "bot")
     render_sessions_sidebar()
-    
+
 async def start_new_session():
     await create_session()
 
 async def send_chat(conclude=False):
     if chat_session_id[0] is None:
+        await create_session()
+
+    # проверяем что текущая сессия не завершена
+    current_concluded = False
+    for s in all_sessions:
+        if s["id"] == chat_session_id[0]:
+            current_concluded = s.get("concluded", False)
+            break
+
+    if current_concluded and not conclude:
         await create_session()
 
     input_el = document.getElementById("chat-input")
@@ -678,23 +673,75 @@ async def send_chat(conclude=False):
 
         if conclude:
             reply = data.conclusion if hasattr(data, "conclusion") else "..."
-            # ↓ было: s["title"] = "Итог сессии"
+            add_message(reply, "bot", is_summary=True)
             for s in all_sessions:
                 if s["id"] == sid:
-                    s["title"] = reply[:40] + ("..." if len(reply) > 40 else "")
                     s["concluded"] = True
+                    short = reply.replace("\n", " ")[:35]
+                    if len(reply) > 35:
+                        short += "..."
+                    s["title"] = "✓ " + short
             render_sessions_sidebar()
-            add_message(reply, "bot")
-            # ↓ новое: автоматически стартуем следующий диалог
-            await create_session()
         else:
             reply = data.bot_message.content if hasattr(data, "bot_message") else "..."
-            # ↓ было раньше, теперь только в else
             add_message(reply, "bot")
 
     except Exception as e:
         remove_typing()
         add_message(f"Ошибка: {str(e)}", "bot")
+
+async def load_session_titles():
+    for s in all_sessions:
+        try:
+            resp = await js.fetch(f"/chat/api/sessions/{s['id']}/")
+            data_text = await resp.text()
+            data = js.JSON.parse(data_text)
+            messages_js = data.messages
+            for i in range(messages_js.length):
+                m = messages_js[i]
+                if m.role == "user":
+                    content = str(m.content)
+                    title = content[:35] + ("..." if len(content) > 35 else "")
+                    s["title"] = ("✓ " if s.get("concluded") else "") + title
+                    break
+        except Exception:
+            pass
+
+async def init_chat():
+    try:
+        resp = await js.fetch("/chat/api/sessions/")
+        data_text = await resp.text()
+        data = js.JSON.parse(data_text)
+        sessions_js = data.sessions
+        all_sessions.clear()
+        for i in range(sessions_js.length):
+            s = sessions_js[i]
+            sid = s.id
+            created = str(s.created_at)[:10] if hasattr(s, "created_at") else ""
+            concluded = s.concluded if hasattr(s, "concluded") else False
+            all_sessions.append({
+                "id": sid,
+                "title": f"Диалог {sid}",
+                "date": created,
+                "concluded": concluded,
+            })
+        await load_session_titles()
+        render_sessions_sidebar()
+    except Exception as e:
+        pass
+
+    if all_sessions:
+        await load_all_history()
+        # активная — последняя незавершённая
+        for s in reversed(all_sessions):
+            if not s.get("concluded"):
+                chat_session_id[0] = s["id"]
+                break
+        if chat_session_id[0] is None:
+            await create_session()
+        render_sessions_sidebar()
+    else:
+        await create_session()
 
 def on_send_click(event):
     asyncio.ensure_future(send_chat(False))
@@ -706,22 +753,6 @@ def on_keydown(event):
     if event.key == "Enter" and not event.shiftKey:
         event.preventDefault()
         asyncio.ensure_future(send_chat(False))
-
-async def init_chat():
-    await load_all_sessions()
-    if all_sessions:
-        # загружаем всю историю
-        await load_all_history()
-        # активная сессия — последняя незавершённая
-        for s in reversed(all_sessions):
-            if not s.get("concluded"):
-                chat_session_id[0] = s["id"]
-                break
-        if chat_session_id[0] is None:
-            await create_session()
-        render_sessions_sidebar()
-    else:
-        await create_session()
 
 asyncio.ensure_future(init_chat())
 
