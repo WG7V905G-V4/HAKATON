@@ -87,6 +87,8 @@ def handle_signup(body: dict) -> dict:
     Returns {"ok": True, "user": {...}, "redirect": "hobbies"} or {"ok": False, "error": "..."}
     """
     name = (body.get("name") or "").strip()
+    # ДОБАВЬ ЭТО ДЛЯ ПРОВЕРКИ:
+    print(f"\n[DEBUG] Мы получили имя из браузера: {name}\n")
     username = (body.get("username") or "").strip()
     age = str(body.get("age") or "").strip()
     password = body.get("password") or ""
