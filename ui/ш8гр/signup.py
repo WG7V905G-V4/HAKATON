@@ -9,7 +9,7 @@ Modes:
 Run with: python server.py  (see server.py)
 This module is imported by the HTTP server.
 """
-
+# костя не ломай код пожалуйста
 import json
 from database.sql import *
 import hashlib
