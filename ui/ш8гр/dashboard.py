@@ -12,7 +12,7 @@ POST {"action": "logout"} → deletes session, returns {"ok": True}
 
 import json
 from pathlib import Path
-from signup import get_session_user, delete_session, _load_users
+# from signup import get_session_user, delete_session, _load_users
 
 
 def get_user_profile(username: str) -> dict | None:

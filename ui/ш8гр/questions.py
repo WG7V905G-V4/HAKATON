@@ -11,7 +11,7 @@ POST → saves answers + hobbies to users.csv (final step of registration)
 import json
 import csv
 from pathlib import Path
-from signup import get_session_user, _load_users, _save_users
+# from signup import get_session_user, _load_users, _save_users
 
 QUESTIONS_CSV = Path("questions.csv")
 
@@ -80,7 +80,7 @@ def finalize_profile(username: str, hobbies: list[str], answers: dict) -> bool:
     Answers → JSON string.
     Returns True on success.
     """
-    users = _load_users()
+
     found = False
     for user in users:
         if user["username"].lower() == username.lower():

@@ -7,13 +7,12 @@ POST → updates the logged-in user's hobbies field in users.csv
        body: {"hobbies": ["Gaming", "Reading"]}
        cookie: session_token=<token>
 """
-
+from database.sql import *
 import json
 import csv
 from pathlib import Path
-from signup import get_session_user, _load_users, _save_users, FIELDNAMES
 
-HOBBIES_CSV = Path("hobbies.csv")
+from signup import get_session_user
 
 
 # ── Read hobbies.csv ───────────────────────────────────────────────────────────
@@ -28,6 +27,7 @@ def load_hobbies() -> list[str]:
         ...
     Falls back to first column if 'hobby' header not found.
     """
+    HOBBIES_CSV = Path("hobbies.csv")
     if not HOBBIES_CSV.exists():
         return _default_hobbies()
 
@@ -57,22 +57,8 @@ def _default_hobbies() -> list[str]:
 
 # ── Save hobbies to user record ────────────────────────────────────────────────
 
-def save_user_hobbies(username: str, hobbies: list[str]) -> bool:
-    """
-    Update the hobbies field for `username` in users.csv.
-    Hobbies are stored pipe-separated: "Gaming|Reading|Yoga"
-    Returns True on success.
-    """
-    users = _load_users()
-    found = False
-    for user in users:
-        if user["username"].lower() == username.lower():
-            user["hobbies"] = "|".join(hobbies)
-            found = True
-            break
-    if found:
-        _save_users(users)
-    return found
+def save_user_hobbies(username: str, hobbies: list[str]):
+    set_hobbies(mycursor, username, hobbies)
 
 
 # ── Request handler ────────────────────────────────────────────────────────────

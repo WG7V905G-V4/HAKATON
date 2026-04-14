@@ -5,8 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6bd33f6-a484-4978-ab4b-13079329920f" name="Changes" comment="checking self location">
+      <change afterPath="$PROJECT_DIR$/ui/ш8гр/database/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/ш8гр/database/sql.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/HAKATON.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/HAKATON.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/sql.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/ш8гр/dashboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/dashboard.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/ш8гр/hobbies.html" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/hobbies.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/ш8гр/hobbies.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/hobbies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/ш8гр/questions.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/questions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/ш8гр/sessions.json" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/sessions.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/ш8гр/signup.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/signup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/ш8гр/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/ui/ш8гр/users.csv" afterDir="false" />
     </list>
@@ -40,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/WG7V905G-V4/HAKATON.git&quot;,
-    &quot;accountId&quot;: &quot;a51991ce-9cba-4837-b0d3-5240f495f053&quot;
+    &quot;accountId&quot;: &quot;46e456ac-e56b-4f59-8e87-7a2fd971146e&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -51,22 +60,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.signup.executor": "Run",
-    "Python.sql.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "server__name__work",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.signup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.sql.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;branch__fix__database&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Savvasova\PycharmProjects\HAKATON\ui\ш8гр" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
       </set>
     </attachedChunks>
   </component>

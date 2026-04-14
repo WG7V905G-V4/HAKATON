@@ -75,12 +75,20 @@
       });
     }
 
-    function goContinue() {
-      const draft = JSON.parse(sessionStorage.getItem('draft_user') || '{}');
-      draft.hobbies = [...selected];
-      sessionStorage.setItem('draft_user', JSON.stringify(draft));
+    async function goContinue() {
+      const hobbies = [...selected];
+
+      await fetch('/hobbies.py', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',   // ← ВОТ СЮДА
+        body: JSON.stringify({ hobbies })
+      });
+
       window.location.href = 'questions.html';
     }
+
+
 
     loadHobbies();
   </script>
