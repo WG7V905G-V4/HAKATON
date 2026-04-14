@@ -8,6 +8,8 @@
   --panel-w:        390px;
   --panel-px:       14px;
 
+  --btn-gap:12px;
+
   --z-map:      0;
   --z-gradient: 150;
   --z-panel:    200;
@@ -71,7 +73,7 @@
   --c-success:      #7dffb3;
   --c-error:        #ff7d9d;
 
-  --glass-blur:       20px;
+  --glass-blur:       5px;
   --glass-blur-card:  12px;
   --glass-blur-panel: 24px;
 
@@ -80,7 +82,7 @@
   --radius-pill:        20px;
   --radius-chip-inner:   8px;
   --radius-participant: 24px;
-  --radius-nav-btn:     10px;
+  --radius-nav-btn:     100%;
   --radius-nav-btn-mob: 14px;
   --radius-scrollbar:    2px;
   --radius-deco:         1px;
@@ -184,7 +186,6 @@ body.panel-1-open::after {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-right: 1px solid var(--glass-border);
   z-index: var(--z-sidebar);
   display: flex;
   align-items: center;
@@ -195,7 +196,7 @@ body.panel-1-open::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--btn-gap);
 }
 
 .nav-btn {
@@ -217,14 +218,10 @@ body.panel-1-open::after {
 }
 .nav-btn:hover {
   color: var(--c-text);
-  background: var(--c-blue);
   transform: scale(1.08);
 }
 .nav-btn.active {
   color: var(--c-text);
-  background: var(--c-btn);
-  box-shadow: 0 2px 12px var(--shadow-nav-active),
-              inset 0 1px 0 var(--c-nav-active-inset);
 }
 
 
@@ -545,16 +542,6 @@ body.panel-1-open::after {
    ШАПКА ПАНЕЛИ
    ════════════════════════════════════════════════════════ */
 
-.panel-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px var(--panel-px) 12px var(--panel-px);
-  background: var(--c-surface);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-}
-
 #panel-1 .panel-header {
   position: absolute;
   top: 0;
@@ -591,6 +578,14 @@ body.panel-1-open::after {
   border-bottom: 1px solid var(--c-header-border);
 }
 
+.panel-header {
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  padding: 14px var(--panel-px) 12px var(--panel-px);
+}
+
 .search-wrap {
   position: relative;
   display: flex;
@@ -603,14 +598,18 @@ body.panel-1-open::after {
   color: var(--c-muted);
   pointer-events: none;
   flex-shrink: 0;
+  z-index: 10;
 }
 
 .search-input {
   width: 100%;
-  background: var(--c-input-bg);
+  padding: 8px 14px 8px 34px;
+  background: transparent;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+
   border: 1px solid var(--c-input-border);
   border-radius: var(--radius-pill);
-  padding: 8px 14px 8px 34px;
   font-family: var(--font-base);
   font-size: var(--font-size-sm);
   color: var(--c-text);
@@ -634,10 +633,11 @@ body.panel-1-open::after {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   padding: 4px 11px;
+  border: 1px solid var(--c-input-border);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  background: var(--c-input-bg);
-  border: 1px solid var(--c-input-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--c-muted);
   user-select: none;
   -webkit-user-select: none;
@@ -660,7 +660,7 @@ body.panel-1-open::after {
 }
 
 #filter-toggle {
-  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -736,14 +736,13 @@ body.panel-1-open::after {
     inset: auto 0 0 0;
     width: 100%;
     height: var(--mobile-nav-h);
-    border-right: none;
-    border-top: 1px solid var(--glass-border);
+    
   }
 
   .btn-bar {
     flex-direction: row;
-    gap: 0;
-    width: 100%;
+    gap: 10%;
+    width: auto;
     justify-content: space-around;
     padding: 0 8px;
   }
