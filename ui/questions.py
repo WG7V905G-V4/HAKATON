@@ -1,45 +1,39 @@
-import io, csv, js
-from pyscript import document
-from pyodide.ffi import create_proxy, to_js
-import asyncio
+from pyscript import document, window
+import pyodide.http
+import json
 
-async def load_questions():
-    response = await js.fetch("questions.csv")
-    buf      = await response.arrayBuffer()
-    text     = js.TextDecoder.new("utf-8").decode(buf)
-    reader   = csv.DictReader(io.StringIO(text))
-    lst      = document.getElementById("questions-list")
+async def finish_registration(event):
+    # Достаем ранее сохраненные данные
+    base_data = json.loads(window.localStorage.getItem("signup_data") or "{}")
+    hobbies = json.loads(window.localStorage.getItem("selected_hobbies") or "[]")
+    
+    # Собираем ответы на вопросы (логика зависит от вашей разметки в q-scroll)
+    answers = {}
+    # Пример: собираем все выбранные кнопки в блоках вопросов
+    # ... (логика сбора селекторов) ...
 
-    def make_single_select(block):
-        def handler(e):
-            chips = block.querySelectorAll(".filter-chip")
-            for i in range(chips.length):
-                chips[i].classList.remove("active")
-            e.target.classList.add("active")
-        return create_proxy(handler)
+    full_profile = {
+        **base_data,
+        "hobbies": hobbies,
+        "answers": answers
+    }
 
-    for row in reader:
-        answers_html = "".join(
-            f'<div class="filter-chip">{row[k]}</div>'
-            for k in ["a1","a2","a3","a4"] if row.get(k,"").strip()
+    try:
+        response = await pyodide.http.pyfetch(
+            url="/api/register/",
+            method="POST",
+            headers={"Content-Type": "application/json"},
+            body=json.dumps(full_profile)
         )
-        lst.insertAdjacentHTML("beforeend", f"""
-        <li class="event-card">
-          <div class="event-main">
-            <div class="event-title">{row["question"]}</div>
-          </div>
-          <div class="event-expandable" style="max-height:none;opacity:1;padding-bottom:14px;">
-            <div class="filter-bar" style="flex-direction:column;">
-              {answers_html}
-            </div>
-          </div>
-        </li>""")
+        
+        if response.ok:
+            window.localStorage.clear() # Чистим кэш
+            window.location.href = "main.html" # Редирект
+        else:
+            error_data = await response.json()
+            window.alert(f"Registration failed: {error_data.get('error')}")
+            
+    except Exception as e:
+        window.alert(f"Server error: {e}")
 
-    blocks = document.querySelectorAll("#questions-list .event-card")
-    for i in range(blocks.length):
-        handler = make_single_select(blocks[i])
-        chips = blocks[i].querySelectorAll(".filter-chip")
-        for j in range(chips.length):
-            chips[j].addEventListener("click", handler)
-
-asyncio.ensure_future(load_questions())
+document.querySelector("#btn-continue").onclick = finish_registration
