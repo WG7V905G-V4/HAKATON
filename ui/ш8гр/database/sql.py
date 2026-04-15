@@ -92,6 +92,51 @@ def set_hobbies(cursor, username, hobbies):
 
 # mycursor.execute("INSERT INTO users (username) VALUES (%s)",("alice",))
 
+import mysql.connector
 
+def fetch_all_from_db():
+    cursor.execute("""
+        SELECT 
+            id,
+            username,
+            title,
+            time_start,
+            time_end,
+            tags,
+            place,
+            lat,
+            lng,
+            descr,
+            participants
+        FROM inf_acts_byusername
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    events = []
+
+    for r in rows:
+        try:
+            lat = float(r["lat"])
+            lng = float(r["lng"])
+        except:
+            # если кривые данные — пропускаем
+            continue
+
+        events.append({
+            "id": r["id"],
+            "title": r["title"],
+            "lat": lat,
+            "lng": lng,
+            "tags": r["tags"] or "",
+            "place": r["place"],
+            "descr": r["descr"],
+            "time_start": r["time_start"],
+            "time_end": r["time_end"],
+            "participants": r["participants"]
+        })
+
+    return events
 
 mydb.commit()

@@ -249,14 +249,10 @@ def make_marker_click(event_id, lat, lng, lat2, lng2):
 all_rows = []
 
 async def load_events():
-    response = await js.fetch("events.csv")
-    buf      = await response.arrayBuffer()
-    text     = js.TextDecoder.new("utf-8").decode(buf)
-    reader   = csv.DictReader(io.StringIO(text))
-    rows     = list(reader)
-    all_rows.extend(rows)
-    render_cards(rows)
-    place_markers(rows)
+    events = await fetch_all_from_db()  # ← твоя новая функция
+    all_rows.extend(events)
+    render_cards(events)
+    place_markers(events)
 
     seen     = set()
     dropdown = document.getElementById("filter-dropdown")
