@@ -50,11 +50,11 @@ def sign_up(cursor, name, username, age, password):
         (name, username, age, password))
     mydb.commit()
 
-def login(cursor, nickname, password):
-    if nickname_used(cursor, nickname):
+def login(cursor, username, password):
+    if nickname_used(cursor, username):
         cursor.execute(
             "SELECT * FROM users WHERE username = %s AND password = %s",
-            (nickname ,password,)
+            (username ,password,)
         )
         return cursor.fetchone() is not None
     else:
