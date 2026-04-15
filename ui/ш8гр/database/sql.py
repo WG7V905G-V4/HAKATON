@@ -89,9 +89,15 @@ def set_hobbies(cursor, username, hobbies):
             "INSERT INTO hobbies (user_name, hobby) VALUES (%s,%s)",
             (username, hobbies[i]))
     mydb.commit()
-
-# mycursor.execute("INSERT INTO users (username) VALUES (%s)",("alice",))
-
-
-
-mydb.commit()
+try:
+    mycursor.execute("""CREATE TABLE inf_acts_byusername ( id INT AUTO_INCREMENT PRIMARY KEY, 
+    username VARCHAR(50),
+     title VARCHAR(255), time_start VARCHAR(255),
+      time_end VARCHAR(255), tags VARCHAR(255), 
+      place VARCHAR(255), lat VARCHAR(255), 
+      lng VARCHAR(255), descr VARCHAR(255), 
+      participants VARCHAR(255), FOREIGN KEY (username) REFERENCES users(username) )""")
+    mydb.commit()
+    print("TABLE CREATED")
+except Exception as e:
+    print("ERROR:", e)
