@@ -61,6 +61,10 @@ def delete_session(token: str) -> None:
 
 
 # ── Core logic ─────────────────────────────────────────────────────────────────
+def handle_login(body):
+    username = (body.get("username") or "").strip()
+    password = body.get("password") or ""
+    return login(mycursor, username, password)
 
 def handle_signup(body: dict) -> dict:
     """
@@ -177,8 +181,8 @@ def handle_request(method: str, body_bytes: bytes, cookie_header: str = "") -> t
     mode = body.get("mode")
     if mode == "signup":
         result = handle_signup(body)
-     # elif mode == "login":
-     #     return None result = handle_login(body)
+    elif mode == "login":
+        return handle_login(body)
     else:
         return {"ok": False, "error": "Unknown mode."}, ""
 

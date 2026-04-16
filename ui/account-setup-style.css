@@ -530,6 +530,20 @@ html, body {
   color: var(--dimmed);
 }
 
+
+.bottom-btns{
+    position: relative
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    gap: 100px;
+    direction: row;
+}
+#dashbord-main{
+    background: var(--c-blue)
+}
+
 /* ══════════════════════════════════════════════════════
    МОБИЛКА
    ══════════════════════════════════════════════════════ */

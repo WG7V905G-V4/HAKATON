@@ -92,10 +92,10 @@ def set_hobbies(cursor, username, hobbies):
 
 # mycursor.execute("INSERT INTO users (username) VALUES (%s)",("alice",))
 
-import mysql.connector
+
 
 def fetch_all_from_db():
-    cursor.execute("""
+    mycursor.execute("""
         SELECT 
             id,
             username,
@@ -111,8 +111,8 @@ def fetch_all_from_db():
         FROM inf_acts_byusername
     """)
 
-    rows = cursor.fetchall()
-    conn.close()
+    rows = mycursor.fetchall()
+    mydb.close()
 
     events = []
 

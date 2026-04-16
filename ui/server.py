@@ -22,6 +22,7 @@ import json
 import mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+#from ui.ш8гр.geoloc_user_events_fucns import set_request_context
 
 import signup
 import hobbies
@@ -83,7 +84,8 @@ class Handler(BaseHTTPRequestHandler):
 
         # Default route
         if path == "/":
-            path = "/signup.html"
+            print("in route")
+            path = "signup.html"
 
         # API endpoints
         if path == "/hobbies.py":
@@ -102,13 +104,14 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         # Static files
-        file_path = Path(".") / path.lstrip("/")
+        file_path = Path(path.lstrip("/"))
         if file_path.suffix in STATIC_EXTS and file_path.exists():
             self._send_static(file_path)
             return
 
         self.send_error(404, f"Not found: {path}")
-
+    def get_cookie(self):
+        return self._cookie()
     # ── POST ──────────────────────────────────────────────────────
     def do_POST(self):
         path = self.path.split("?")[0]
@@ -141,7 +144,7 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     server = HTTPServer(("", PORT), Handler)
     print(f"✓ Server running at http://localhost:{PORT}/")
-    print("  Open http://localhost:{PORT}/signup.html to start.\n")
+    print(f"  Open http://localhost:{PORT}/signup.html to start.\n")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

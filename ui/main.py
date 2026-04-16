@@ -1,7 +1,10 @@
-import io, csv, js
+import js
+from urllib import request
+
 from pyscript import document
 from pyodide.ffi import create_proxy, to_js
 import asyncio
+from ui.filter import *
 
 # ── Карта ────────────────────────────────────────────────
 map_options = js.Object.new()
@@ -249,7 +252,8 @@ def make_marker_click(event_id, lat, lng, lat2, lng2):
 all_rows = []
 
 async def load_events():
-    events = await fetch_all_from_db()  # ← твоя новая функция
+    cookie_header = request.headers.get("Cookie")
+    events = await fetch_and_rank_events()
     all_rows.extend(events)
     render_cards(events)
     place_markers(events)
