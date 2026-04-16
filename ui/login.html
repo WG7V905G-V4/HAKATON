@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign up</title>
+  <title>Log in</title>
   <link rel="stylesheet" href="account-setup-style.css" />
   <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
   <script defer src="https://pyscript.net/latest/pyscript.js"></script>
@@ -16,8 +16,8 @@
     <div class="glass-card signup-card anim">
 
       <div class="signup-heading anim anim-d1">
-        <h1>Sign up</h1>
-        <div class="signup-toggle" onclick="window.location.href='login.html'">or log in</div>
+        <h1>Log in</h1>
+        <div class="signup-toggle" onclick="window.location.href='signup.html'">or sign up</div>
       </div>
 
       <div id="flash" class="flash"></div>
@@ -25,21 +25,9 @@
       <div class="signup-fields anim anim-d2">
 
         <div class="field-group">
-          <label class="field-label" for="inp-name">Name</label>
-          <input class="field-input" id="inp-name" type="text"
-                 placeholder="Your name" autocomplete="off" />
-        </div>
-
-        <div class="field-group">
           <label class="field-label" for="inp-username">Username</label>
           <input class="field-input" id="inp-username" type="text"
                  placeholder="unique_username" autocomplete="off" />
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="inp-age">Age</label>
-          <input class="field-input" id="inp-age" type="number"
-                 min="1" max="120" placeholder="25" autocomplete="off" />
         </div>
 
         <div class="field-group">
@@ -51,12 +39,12 @@
       </div>
 
       <div class="signup-footer anim anim-d3">
-        <button class="btn btn-primary" id="signup-btn">continue</button>
+        <button class="btn btn-primary" id="login-btn">continue</button>
       </div>
 
     </div>
   </div>
 
-  <py-script src="signup.py"></py-script>
+  <py-script src="login.py"></py-script>
 </body>
 </html>

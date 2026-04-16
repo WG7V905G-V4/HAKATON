@@ -3,11 +3,9 @@ from js import sessionStorage, window
 from pyodide.http import pyfetch
 import json
 
-async def handle_signup(event=None):
+async def handle_login(event=None):
     # Get form values
-    name = pydom["#inp-name"][0].value.strip()
     username = pydom["#inp-username"][0].value.strip()
-    age = pydom["#inp-age"][0].value.strip()
     password = pydom["#inp-password"][0].value
     
     # Clear previous flash message
@@ -15,7 +13,7 @@ async def handle_signup(event=None):
     flash.style.display = "none"
     
     # Validation
-    if not name or not username or not age or not password:
+    if not username or not password:
         flash.textContent = "Please fill in all fields."
         flash.className = "flash error"
         flash.style.display = "block"
@@ -23,30 +21,28 @@ async def handle_signup(event=None):
     
     try:
         # Send request to server
-        response = await pyfetch("/signup.py", method="POST", 
+        response = await pyfetch("/signup.py", method="POST",
                                 headers={"Content-Type": "application/json"},
-                                body=json.dumps({"mode": "signup", "name": name, 
-                                               "username": username, "age": age, 
+                                body=json.dumps({"mode": "login", "username": username,
                                                "password": password}))
         res = await response.json()
         
         if res.get("ok"):
             sessionStorage.setItem("draft_user", json.dumps(res.get("user")))
-            window.location.href = "hobbies.html"
+            window.location.href = "dashboard.html"
         else:
-            flash.textContent = res.get("error", "Something went wrong.")
+            flash.textContent = res.get("error", "Invalid username or password.")
             flash.className = "flash error"
             flash.style.display = "block"
     except Exception as e:
         # Fallback for server error
-        sessionStorage.setItem("draft_user", json.dumps({"name": name, "username": username, 
-                                                        "age": age, "hobbies": [], "answers": {}}))
-        window.location.href = "hobbies.html"
+        sessionStorage.setItem("draft_user", json.dumps({"username": username}))
+        window.location.href = "dashboard.html"
 
 def on_enter(event):
     if event.key == "Enter":
-        handle_signup()
+        handle_login()
 
 # Setup event listeners
-pydom["#signup-btn"][0].onclick = handle_signup
+pydom["#login-btn"][0].onclick = handle_login
 pydom.window.document.addEventListener("keydown", on_enter)
