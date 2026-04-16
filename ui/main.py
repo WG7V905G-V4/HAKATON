@@ -1,10 +1,9 @@
-import js
-from urllib import request
+import json as pyjson
 
+import io, csv, js
 from pyscript import document
 from pyodide.ffi import create_proxy, to_js
 import asyncio
-from ui.filter import *
 
 # ── Карта ────────────────────────────────────────────────
 map_options = js.Object.new()
@@ -252,11 +251,14 @@ def make_marker_click(event_id, lat, lng, lat2, lng2):
 all_rows = []
 
 async def load_events():
-    cookie_header = request.headers.get("Cookie")
-    events = await fetch_and_rank_events()
-    all_rows.extend(events)
-    render_cards(events)
-    place_markers(events)
+    response = await js.fetch("/static/events.csv")
+    buf      = await response.arrayBuffer()
+    text     = js.TextDecoder.new("utf-8").decode(buf)
+    reader   = csv.DictReader(io.StringIO(text))
+    rows     = list(reader)
+    all_rows.extend(rows)
+    render_cards(rows)
+    place_markers(rows)
 
     seen     = set()
     dropdown = document.getElementById("filter-dropdown")
@@ -465,3 +467,295 @@ def on_create(event):
     show_hint(f"«{title}» добавлено!", "success")
 
 document.getElementById("btn-create").addEventListener("click", create_proxy(on_create))
+
+
+
+# ── Чат ──────────────────────────────────────────────────
+
+chat_session_id = [None]
+all_sessions = []
+
+def add_message(text, role, anchor_id=None, is_summary=False):
+    messages_el = document.getElementById("chat-messages")
+    div = document.createElement("div")
+    cls = "chat-msg chat-msg--" + ("user" if role == "user" else "bot")
+    if is_summary:
+        cls += " chat-msg--summary"
+    div.className = cls
+
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if line.strip():
+            span = document.createElement("span")
+            span.textContent = line
+            div.appendChild(span)
+        if i < len(lines) - 1:
+            div.appendChild(document.createElement("br"))
+
+    if anchor_id:
+        div.id = anchor_id
+    messages_el.appendChild(div)
+    messages_el.scrollTop = messages_el.scrollHeight
+
+def add_typing():
+    messages_el = document.getElementById("chat-messages")
+    div = document.createElement("div")
+    div.className = "chat-msg chat-msg--bot"
+    div.id = "typing-indicator"
+    div.textContent = "..."
+    messages_el.appendChild(div)
+    messages_el.scrollTop = messages_el.scrollHeight
+
+def remove_typing():
+    t = document.getElementById("typing-indicator")
+    if t:
+        t.remove()
+
+def add_session_divider(session_id, label):
+    messages_el = document.getElementById("chat-messages")
+    div = document.createElement("div")
+    div.className = "chat-session-divider"
+    div.id = f"session-anchor-{session_id}"
+    inner = document.createElement("span")
+    inner.className = "chat-session-divider-label"
+    inner.textContent = label
+    div.appendChild(inner)
+    messages_el.appendChild(div)
+
+def render_sessions_sidebar():
+    sidebar = document.getElementById("chat-sessions-list")
+    sidebar.innerHTML = ""
+
+
+    for s in reversed(all_sessions):
+        item = document.createElement("div")
+        item.className = "chat-session-item" + (" active" if s["id"] == chat_session_id[0] else "")
+        item.setAttribute("data-sid", str(s["id"]))
+
+        date_div = document.createElement("div")
+        date_div.className = "session-date"
+        date_div.textContent = s.get("date", "—")
+        item.appendChild(date_div)
+
+        title_div = document.createElement("div")
+        title_div.textContent = s.get("title", f"Диалог {s['id']}")
+        item.appendChild(title_div)
+
+        sid = s["id"]
+        concluded = s.get("concluded", False)
+        item.addEventListener("click", create_proxy(make_session_click(sid, concluded)))
+        sidebar.appendChild(item)
+
+def make_session_click(sid, concluded):
+    def handler(e):
+        anchor = document.getElementById(f"session-anchor-{sid}")
+        if anchor:
+            anchor.scrollIntoView(to_js({"behavior": "smooth", "block": "start"}))
+        # переключаем активную только если не завершена
+        if not concluded:
+            chat_session_id[0] = sid
+        items = document.querySelectorAll(".chat-session-item")
+        for i in range(items.length):
+            items[i].classList.remove("active")
+            if items[i].getAttribute("data-sid") == str(sid):
+                items[i].classList.add("active")
+    return handler
+
+async def load_session_messages(sid, is_concluded=False):
+    try:
+        resp = await js.fetch(f"/chat/api/sessions/{sid}/")
+        data_text = await resp.text()
+        data = js.JSON.parse(data_text)
+        messages_js = data.messages
+        for i in range(messages_js.length):
+            m = messages_js[i]
+            # последнее сообщение ассистента в завершённой сессии — summary
+            is_last = (i == messages_js.length - 1)
+            is_sum = is_concluded and m.role == "assistant" and is_last
+            add_message(m.content, m.role, is_summary=is_sum)
+    except Exception as e:
+        pass
+
+async def load_all_history():
+    messages_el = document.getElementById("chat-messages")
+    messages_el.innerHTML = ""
+    for s in all_sessions:
+        sid = s["id"]
+        label = s.get("date", f"Диалог {sid}")
+        if s.get("concluded"):
+            label += " ✓"
+        add_session_divider(sid, label)
+        await load_session_messages(sid, is_concluded=s.get("concluded", False))
+    messages_el = document.getElementById("chat-messages")
+    messages_el.scrollTop = messages_el.scrollHeight
+
+async def create_session():
+    fetch_opts = to_js({
+        "method": "POST",
+        "headers": {"Content-Type": "application/json"},
+    }, dict_converter=js.Object.fromEntries)
+
+    resp = await js.fetch("/chat/api/sessions/", fetch_opts)
+    data_text = await resp.text()
+    data = js.JSON.parse(data_text)
+    sid = data.session.id
+    chat_session_id[0] = sid
+
+    today = js.Date.new().toLocaleDateString("ru-RU")
+    all_sessions.append({
+        "id": sid,
+        "title": "Новый диалог",
+        "date": today,
+        "concluded": False,
+    })
+
+    add_session_divider(sid, today)
+    add_message("Привет! Как ты себя чувствуешь сегодня?", "bot")
+    render_sessions_sidebar()
+
+async def start_new_session():
+    await create_session()
+
+async def send_chat(conclude=False):
+    if chat_session_id[0] is None:
+        await create_session()
+
+    # проверяем что текущая сессия не завершена
+    current_concluded = False
+    for s in all_sessions:
+        if s["id"] == chat_session_id[0]:
+            current_concluded = s.get("concluded", False)
+            break
+
+    if current_concluded and not conclude:
+        await create_session()
+
+    input_el = document.getElementById("chat-input")
+    text = input_el.value.strip()
+
+    if not text and not conclude:
+        return
+
+    if not conclude:
+        add_message(text, "user")
+        input_el.value = ""
+
+    add_typing()
+
+    try:
+        sid = chat_session_id[0]
+
+        if conclude:
+            url = f"/chat/api/sessions/{sid}/conclude/"
+            fetch_opts = to_js({
+                "method": "POST",
+                "headers": {"Content-Type": "application/json"},
+                "body": pyjson.dumps({})
+            }, dict_converter=js.Object.fromEntries)
+        else:
+            url = f"/chat/api/sessions/{sid}/send/"
+            fetch_opts = to_js({
+                "method": "POST",
+                "headers": {"Content-Type": "application/json"},
+                "body": pyjson.dumps({"content": text})
+            }, dict_converter=js.Object.fromEntries)
+
+        resp = await js.fetch(url, fetch_opts)
+        data_text = await resp.text()
+
+        if not data_text.strip():
+            remove_typing()
+            add_message("Сервер вернул пустой ответ.", "bot")
+            return
+
+        data = js.JSON.parse(data_text)
+        remove_typing()
+
+        if conclude:
+            reply = data.conclusion if hasattr(data, "conclusion") else "..."
+            add_message(reply, "bot", is_summary=True)
+            for s in all_sessions:
+                if s["id"] == sid:
+                    s["concluded"] = True
+                    short = reply.replace("\n", " ")[:35]
+                    if len(reply) > 35:
+                        short += "..."
+                    s["title"] = "✓ " + short
+            render_sessions_sidebar()
+        else:
+            reply = data.bot_message.content if hasattr(data, "bot_message") else "..."
+            add_message(reply, "bot")
+
+    except Exception as e:
+        remove_typing()
+        add_message(f"Ошибка: {str(e)}", "bot")
+
+async def load_session_titles():
+    for s in all_sessions:
+        try:
+            resp = await js.fetch(f"/chat/api/sessions/{s['id']}/")
+            data_text = await resp.text()
+            data = js.JSON.parse(data_text)
+            messages_js = data.messages
+            for i in range(messages_js.length):
+                m = messages_js[i]
+                if m.role == "user":
+                    content = str(m.content)
+                    title = content[:35] + ("..." if len(content) > 35 else "")
+                    s["title"] = ("✓ " if s.get("concluded") else "") + title
+                    break
+        except Exception:
+            pass
+
+async def init_chat():
+    try:
+        resp = await js.fetch("/chat/api/sessions/")
+        data_text = await resp.text()
+        data = js.JSON.parse(data_text)
+        sessions_js = data.sessions
+        all_sessions.clear()
+        for i in range(sessions_js.length):
+            s = sessions_js[i]
+            sid = s.id
+            created = str(s.created_at)[:10] if hasattr(s, "created_at") else ""
+            concluded = s.concluded if hasattr(s, "concluded") else False
+            all_sessions.append({
+                "id": sid,
+                "title": f"Диалог {sid}",
+                "date": created,
+                "concluded": concluded,
+            })
+        await load_session_titles()
+        render_sessions_sidebar()
+    except Exception as e:
+        pass
+
+    if all_sessions:
+        await load_all_history()
+        # активная — последняя незавершённая
+        for s in reversed(all_sessions):
+            if not s.get("concluded"):
+                chat_session_id[0] = s["id"]
+                break
+        if chat_session_id[0] is None:
+            await create_session()
+        render_sessions_sidebar()
+    else:
+        await create_session()
+
+def on_send_click(event):
+    asyncio.ensure_future(send_chat(False))
+
+def on_end_click(event):
+    asyncio.ensure_future(send_chat(True))
+
+def on_keydown(event):
+    if event.key == "Enter" and not event.shiftKey:
+        event.preventDefault()
+        asyncio.ensure_future(send_chat(False))
+
+asyncio.ensure_future(init_chat())
+
+document.getElementById("chat-send").addEventListener("click", create_proxy(on_send_click))
+document.getElementById("chat-end").addEventListener("click", create_proxy(on_end_click))
+document.getElementById("chat-input").addEventListener("keydown", create_proxy(on_keydown))

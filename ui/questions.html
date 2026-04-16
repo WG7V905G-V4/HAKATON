@@ -4,130 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Questions</title>
-  <link rel="stylesheet" href="/static/account-setup-style.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
 
-  <div class="page-bg" style="--page-bg: url('img/login_back.jpg');"></div>
+  <div class="page-bg" style="--page-bg: url('/static/img/login_back.jpg');"></div>
 
   <div class="page-scroll">
 
-    <!-- прилипающий заголовок -->
     <div class="q-header anim anim-d1">
       <div class="title-pill">Answer some questions</div>
     </div>
 
-    <!-- прокручиваемый список вопросов -->
+    <div id="flash" class="flash"></div>
+
     <div class="q-scroll" id="q-scroll"></div>
 
-    <!-- прилипающие кнопки -->
     <div class="q-footer anim anim-d2">
       <div class="bottom-bar">
-        <button class="btn btn-ghost" onclick="history.back()">back</button>
-        <button class="btn btn-primary" onclick="goContinue()">continue</button>
+        <button class="btn btn-ghost"   id="btn-back">back</button>
+        <button class="btn btn-primary" id="btn-continue">continue</button>
       </div>
     </div>
 
   </div>
 
-  <script>
-    const answers = {};
-
-    async function loadQuestions() {
-      let questions = [];
-      try {
-        const res  = await fetch('/questions.py');
-        const data = await res.json();
-        questions  = data.questions;
-      } catch {
-        try {
-          const res  = await fetch('questions.csv');
-          const text = await res.text();
-          questions  = parseCSV(text);
-        } catch {
-          questions = [
-            { question: 'How do you prefer to spend your evenings?',
-              options:  ['Reading a book','Watching movies','Going out with friends','Playing video games'] },
-            { question: 'What kind of music do you enjoy most?',
-              options:  ['Pop','Rock / Metal','Electronic / DJ','Classical / Jazz'] },
-            { question: 'How active are you on a typical day?',
-              options:  ['Very active – gym or sport daily','Moderately active – walks','Mostly sedentary – office work','It varies a lot'] },
-            { question: "What's your ideal vacation?",
-              options:  ['Beach & relaxation','City exploration','Nature & hiking','Road trip'] },
-            { question: 'How do you handle stressful situations?',
-              options:  ['I talk to someone','I take a walk or exercise','I distract myself','I prefer to be alone'] },
-          ];
-        }
-      }
-      render(questions);
-    }
-
-    /* CSV: question,option1,option2,option3,option4 */
-    function parseCSV(text) {
-      const lines  = text.trim().split('\n');
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-      const qCol   = header.indexOf('question');
-      return lines.slice(1).map(line => {
-        const cols    = line.split(',').map(c => c.trim());
-        const question = cols[qCol !== -1 ? qCol : 0];
-        const options  = cols.slice(qCol !== -1 ? qCol + 1 : 1).filter(Boolean);
-        return { question, options };
-      });
-    }
-
-    function render(questions) {
-      const scroll = document.getElementById('q-scroll');
-      scroll.innerHTML = '';
-      questions.forEach((q, i) => {
-        const block = document.createElement('div');
-        block.className = 'q-block anim';
-        block.style.animationDelay = (0.07 * i + 0.1) + 's';
-
-        const title = document.createElement('div');
-        title.className   = 'q-section-title';
-        title.textContent = q.question;
-        block.appendChild(title);
-
-        const opts = document.createElement('div');
-        opts.className = 'q-options';
-        q.options.forEach(opt => {
-          const btn = document.createElement('button');
-          btn.className   = 'option-btn';
-          btn.textContent = opt;
-          btn.addEventListener('click', () => {
-            opts.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            answers[i] = opt;
-          });
-          opts.appendChild(btn);
-        });
-
-        block.appendChild(opts);
-        scroll.appendChild(block);
-      });
-    }
-
-    async function goContinue() {
-      const draft = JSON.parse(sessionStorage.getItem('draft_user') || '{}');
-      draft.answers = answers;
-      sessionStorage.setItem('draft_user', JSON.stringify(draft));
-
-      try {
-        const res  = await fetch('/questions.py', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(draft)
-        });
-        const data = await res.json();
-        if (data.ok) { window.location.href = 'dashboard.html'; }
-        else         { alert(data.error || 'Error saving profile.'); }
-      } catch {
-        // Demo: skip server
-        window.location.href = 'dashboard.html';
-      }
-    }
-
-    loadQuestions();
-  </script>
+  <py-script src="/static/questions.py"></py-script>
 </body>
 </html>

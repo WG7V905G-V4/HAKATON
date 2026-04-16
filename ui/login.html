@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Log in</title>
-  <link rel="stylesheet" href="/static/account-setup-style.css">
+  <link rel="stylesheet" href="/static/style.css" />
   <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
   <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
 
-  <div class="page-bg" style="--page-bg: url('img/login_back.jpg');"></div>
+  <div class="page-bg" style="--page-bg: url('/static/img/login_back.jpg');"></div>
 
   <div class="page-center">
     <div class="glass-card signup-card anim">
 
       <div class="signup-heading anim anim-d1">
         <h1>Log in</h1>
-        <div class="signup-toggle" onclick="window.location.href='signup.html'">or sign up</div>
+        <div class="signup-toggle" onclick="window.location.href='/signup.html'">or sign up</div>
       </div>
 
       <div id="flash" class="flash"></div>
@@ -33,7 +33,7 @@
         <div class="field-group">
           <label class="field-label" for="inp-password">Password</label>
           <input class="field-input" id="inp-password" type="password"
-                 placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="off" />
+                 placeholder="••••••••" autocomplete="off" />
         </div>
 
       </div>
@@ -45,6 +45,6 @@
     </div>
   </div>
 
-  <py-script src="login.py"></py-script>
+  <py-script src="/static/login.py"></py-script>
 </body>
 </html>

@@ -25,6 +25,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
 
+
 # ── БД ────────────────────────────────────────────────────────────────────────
 
 def get_db():
@@ -33,6 +34,7 @@ def get_db():
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row   # доступ к колонкам по имени
     return conn
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

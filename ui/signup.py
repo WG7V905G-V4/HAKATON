@@ -1,52 +1,68 @@
-from pyweb import pydom
-from js import sessionStorage, window
-from pyodide.http import pyfetch
 import json
+import asyncio
+from js import window, document, sessionStorage, fetch, Object
+from pyodide.ffi import to_js
+
+
+def show_flash(msg, ok=False):
+    f = document.getElementById("flash")
+    f.textContent = msg
+    f.className = "flash " + ("success" if ok else "error")
+    f.style.display = "block"
+
+
+def hide_flash():
+    f = document.getElementById("flash")
+    f.style.display = "none"
+
 
 async def handle_signup(event=None):
-    # Get form values
-    name = pydom["#inp-name"][0].value.strip()
-    username = pydom["#inp-username"][0].value.strip()
-    age = pydom["#inp-age"][0].value.strip()
-    password = pydom["#inp-password"][0].value
-    
-    # Clear previous flash message
-    flash = pydom["#flash"][0]
-    flash.style.display = "none"
-    
-    # Validation
+    hide_flash()
+
+    name     = document.getElementById("inp-name").value.strip()
+    username = document.getElementById("inp-username").value.strip()
+    age      = document.getElementById("inp-age").value.strip()
+    password = document.getElementById("inp-password").value
+
     if not name or not username or not age or not password:
-        flash.textContent = "Please fill in all fields."
-        flash.className = "flash error"
-        flash.style.display = "block"
+        show_flash("Please fill in all fields.")
         return
-    
+
     try:
-        # Send request to server
-        response = await pyfetch("/signup.py", method="POST", 
-                                headers={"Content-Type": "application/json"},
-                                body=json.dumps({"mode": "signup", "name": name, 
-                                               "username": username, "age": age, 
-                                               "password": password}))
-        res = await response.json()
-        
+        payload = json.dumps({
+            "mode": "signup",
+            "name": name,
+            "username": username,
+            "age": age,
+            "password": password,
+        })
+
+        opts = to_js({
+            "method": "POST",
+            "headers": {"Content-Type": "application/json"},
+            "credentials": "include",
+            "body": payload,
+        }, dict_converter=Object.fromEntries)
+
+        response = await fetch("/signup.py", opts)
+        res = (await response.json()).to_py()
+
         if res.get("ok"):
-            sessionStorage.setItem("draft_user", json.dumps(res.get("user")))
-            window.location.href = "hobbies.html"
+            sessionStorage.setItem("draft_user", json.dumps(res.get("user", {})))
+            window.location.href = "/hobbies.html"
         else:
-            flash.textContent = res.get("error", "Something went wrong.")
-            flash.className = "flash error"
-            flash.style.display = "block"
+            show_flash(res.get("error", "Something went wrong."))
+
     except Exception as e:
-        # Fallback for server error
-        sessionStorage.setItem("draft_user", json.dumps({"name": name, "username": username, 
-                                                        "age": age, "hobbies": [], "answers": {}}))
-        window.location.href = "hobbies.html"
+        show_flash(f"Error: {e}")
 
-def on_enter(event):
+
+def on_key(event):
     if event.key == "Enter":
-        handle_signup()
+        asyncio.ensure_future(handle_signup())
 
-# Setup event listeners
-pydom["#signup-btn"][0].onclick = handle_signup
-pydom.window.document.addEventListener("keydown", on_enter)
+
+document.getElementById("signup-btn").addEventListener(
+    "click", lambda e: asyncio.ensure_future(handle_signup())
+)
+document.addEventListener("keydown", on_key)

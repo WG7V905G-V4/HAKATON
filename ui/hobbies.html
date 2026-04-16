@@ -4,93 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hobbies</title>
-  <link rel="stylesheet" href="/static/account-setup-style.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
 
-  <div class="page-bg" style="--page-bg: url('img/login_back.jpg');"></div>
+  <div class="page-bg" style="--page-bg: url('/static/img/login_back.jpg');"></div>
 
   <div class="page-center">
     <div class="hobbies-wrap">
 
       <div class="title-pill anim anim-d1">Tell us about your hobbies</div>
 
+      <div id="flash" class="flash"></div>
+
       <div class="chips-grid anim anim-d2" id="chips-container">
-        <!-- injected by JS from hobbies.csv -->
+        <!-- заполняется из hobbies_client.py -->
       </div>
 
       <div class="bottom-bar anim anim-d3">
-        <button class="btn btn-ghost" onclick="history.back()">back</button>
-        <button class="btn btn-primary" onclick="goContinue()">continue</button>
+        <button class="btn btn-ghost"    id="btn-back">back</button>
+        <button class="btn btn-primary"  id="btn-continue">continue</button>
       </div>
 
     </div>
   </div>
 
-  <script>
-    const selected = new Set();
-
-    async function loadHobbies() {
-      let hobbies = [];
-      try {
-        const res  = await fetch('/hobbies.py');
-        const data = await res.json();
-        hobbies = data.hobbies;
-      } catch {
-        try {
-          const res  = await fetch('hobbies.csv');
-          const text = await res.text();
-          hobbies = parseCSV(text);
-        } catch {
-          hobbies = [
-            'Photography','Cooking','Gaming','Reading','Hiking','Music',
-            'Travel','Painting','Cycling','Dancing','Swimming','Yoga',
-            'Coding','Gardening','Chess','Writing','Fishing','Surfing',
-            'Climbing','Pottery','Skateboarding','Film','3D Art','Drawing'
-          ];
-        }
-      }
-      render(hobbies);
-    }
-
-    function parseCSV(text) {
-      const lines  = text.trim().split('\n');
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-      const col    = header.includes('hobby') ? header.indexOf('hobby') : 0;
-      return lines.slice(1).map(l => l.split(',')[col]?.trim()).filter(Boolean);
-    }
-
-    function render(hobbies) {
-      const wrap = document.getElementById('chips-container');
-      wrap.innerHTML = '';
-      hobbies.forEach(hobby => {
-        const btn = document.createElement('button');
-        btn.className   = 'chip';
-        btn.textContent = hobby;
-        btn.addEventListener('click', () => {
-          if (selected.has(hobby)) { selected.delete(hobby); btn.classList.remove('selected'); }
-          else                     { selected.add(hobby);    btn.classList.add('selected');    }
-        });
-        wrap.appendChild(btn);
-      });
-    }
-
-    async function goContinue() {
-      const hobbies = [...selected];
-
-      await fetch('/hobbies.py', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',   // ← ВОТ СЮДА
-        body: JSON.stringify({ hobbies })
-      });
-
-      window.location.href = 'questions.html';
-    }
-
-
-
-    loadHobbies();
-  </script>
+  <py-script src="/static/hobbies.py"></py-script>
 </body>
 </html>
