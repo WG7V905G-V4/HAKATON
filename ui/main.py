@@ -522,26 +522,85 @@ def add_session_divider(session_id, label):
     div.appendChild(inner)
     messages_el.appendChild(div)
 
+async def delete_session(sid):
+    """Delete a session via API and refresh the UI."""
+    try:
+        fetch_opts = to_js({
+            "method": "DELETE",
+            "headers": {"Content-Type": "application/json"},
+        }, dict_converter=js.Object.fromEntries)
+        await js.fetch(f"/chat/api/sessions/{sid}/", fetch_opts)
+
+        # Remove from local state
+        for i, s in enumerate(all_sessions):
+            if s["id"] == sid:
+                all_sessions.pop(i)
+                break
+
+        # If deleted session was the active one, reset
+        if chat_session_id[0] == sid:
+            chat_session_id[0] = None
+
+        # Rebuild chat area
+        messages_el = document.getElementById("chat-messages")
+        messages_el.innerHTML = ""
+
+        if all_sessions:
+            await load_all_history()
+            # Pick latest non-concluded as active
+            for s in reversed(all_sessions):
+                if not s.get("concluded"):
+                    chat_session_id[0] = s["id"]
+                    break
+            # All concluded — start a fresh session
+            if chat_session_id[0] is None:
+                await create_session()
+        else:
+            # No sessions left — create a new one
+            await create_session()
+
+        render_sessions_sidebar()
+    except Exception as e:
+        pass
+
+def make_delete_handler(sid):
+    def handler(e):
+        e.stopPropagation()  # don't trigger session-click
+        asyncio.ensure_future(delete_session(sid))
+    return create_proxy(handler)
+
 def render_sessions_sidebar():
     sidebar = document.getElementById("chat-sessions-list")
     sidebar.innerHTML = ""
-
 
     for s in reversed(all_sessions):
         item = document.createElement("div")
         item.className = "chat-session-item" + (" active" if s["id"] == chat_session_id[0] else "")
         item.setAttribute("data-sid", str(s["id"]))
 
+        # Info wrapper (date + title)
+        info = document.createElement("div")
+        info.className = "session-info"
+
         date_div = document.createElement("div")
         date_div.className = "session-date"
         date_div.textContent = s.get("date", "—")
-        item.appendChild(date_div)
+        info.appendChild(date_div)
 
         title_div = document.createElement("div")
-        title_div.textContent = s.get("title", f"Диалог {s['id']}")
-        item.appendChild(title_div)
+        title_div.textContent = s.get("title", f"Dialogue {s['id']}")
+        info.appendChild(title_div)
 
+        item.appendChild(info)
+
+        # Delete button (×) — visible on hover via CSS
+        del_btn = document.createElement("button")
+        del_btn.className = "delete-session-btn"
+        del_btn.title = "Delete this chat"
         sid = s["id"]
+        del_btn.addEventListener("click", make_delete_handler(sid))
+        item.appendChild(del_btn)
+
         concluded = s.get("concluded", False)
         item.addEventListener("click", create_proxy(make_session_click(sid, concluded)))
         sidebar.appendChild(item)
@@ -604,13 +663,25 @@ async def create_session():
     today = js.Date.new().toLocaleDateString("ru-RU")
     all_sessions.append({
         "id": sid,
-        "title": "Новый диалог",
+        "title": "New dialogue",
         "date": today,
         "concluded": False,
     })
 
     add_session_divider(sid, today)
-    add_message("Привет! Как ты себя чувствуешь сегодня?", "bot")
+
+    # Load the real greeting message saved by the server (not a hardcoded string)
+    try:
+        detail_resp = await js.fetch(f"/chat/api/sessions/{sid}/")
+        detail_text = await detail_resp.text()
+        detail_data = js.JSON.parse(detail_text)
+        msgs = detail_data.messages
+        for i in range(msgs.length):
+            m = msgs[i]
+            add_message(m.content, m.role)
+    except Exception:
+        pass
+
     render_sessions_sidebar()
 
 async def start_new_session():

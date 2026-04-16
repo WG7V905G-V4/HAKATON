@@ -1386,3 +1386,51 @@ body.panel-1-open::after {
   font-size: 13px;
   line-height: 1.7;
 }
+.chat-session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  /* ... остальные твои текущие стили для .chat-session-item ... */
+}
+.session-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.delete-session-btn {
+  background: rgba(255, 69, 58, 0.1); /* Легкий красный фон */
+  color: rgba(255, 69, 58, 0.9);
+  border: none;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0; /* Скрыта по умолчанию */
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+.delete-session-btn::before,
+.delete-session-btn::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 1.5px;
+  background-color: currentColor;
+}
+.delete-session-btn::before { transform: rotate(45deg); }
+.delete-session-btn::after { transform: rotate(-45deg); }
+.delete-session-btn:hover {
+  background: rgba(255, 69, 58, 0.25);
+  color: rgba(255, 69, 58, 1);
+  transform: scale(1);
+}
+.chat-session-item:hover .delete-session-btn {
+  opacity: 1;
+  transform: scale(1);
+}

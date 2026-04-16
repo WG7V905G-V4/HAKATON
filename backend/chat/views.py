@@ -40,11 +40,33 @@ class SessionListView(View):
         )
 
     def post(self, request):
-        session  = ChatSession.objects.create()
+        session = ChatSession.objects.create()
         greeting = (
-            "Привет! Я твой ИИ-психологический помощник. "
-            "Здесь безопасно — можешь говорить о чём угодно. "
-            "Как ты себя чувствуешь сегодня?"
+            "Welcome. I'm your AI psychological support assistant — "
+            "think of me as a compassionate, non-judgmental space where you can speak freely.\n\n"
+
+            "Here is what I can do for you:\n"
+            "• Listen deeply and reflect back what you're experiencing\n"
+            "• Help you work through difficult emotions, stress, anxiety, or low mood\n"
+            "• Apply evidence-based techniques from CBT, mindfulness, and strength-based therapy\n"
+            "• Offer psychoeducation — plain-language explanations of what you might be feeling and why\n"
+            "• Track patterns across sessions — I remember the themes and progress from our previous talks\n"
+            "• Generate a professional session summary at the end of our conversation\n\n"
+
+            "A few things to know before we start:\n"
+            "1. I respond in whatever language you write in — Russian, English, Hebrew, Ukrainian, or any other.\n"
+            "2. I am not a doctor and will never give a clinical diagnosis. "
+            "If you are in crisis, I will always provide emergency resources immediately.\n"
+            "3. Everything stays here — your sessions are stored only on your own device.\n"
+            "4. When you are ready to close a session, press 'End session' and I will write a structured summary for you.\n\n"
+
+            "How to get the most out of our sessions:\n"
+            "• Be as open as you feel comfortable — the more context you share, the more I can help\n"
+            "• You can ask me to focus on a specific technique: 'help me reframe this thought', "
+            "'guide me through a breathing exercise', 'what does anxiety actually do to the body?'\n"
+            "• You can review any past session from the sidebar on the left\n\n"
+
+            "I'm here, fully present. Whenever you're ready — just start talking."
         )
         Message.objects.create(
             session=session,

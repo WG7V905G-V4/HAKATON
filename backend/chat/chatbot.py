@@ -1,6 +1,5 @@
 import os
 from django.conf import settings
-from huggingface_hub import InferenceClient
 
 # ── System prompt ──────────────────────────────────────────────────────────
 
@@ -68,7 +67,7 @@ CONCLUSION_TRIGGER = (
     "Please write a full session summary now. "
     "IMPORTANT: Do NOT use any emoji, decorative borders or lines. "
     "Use plain numbered sections separated by blank lines. "
-    "Start with just the plain title 'Итог сессии' (or the language equivalent), then a blank line, then sections 1-5.]"
+    "Start with just the plain title 'conclusion of the session' (or the language equivalent), then a blank line, then sections 1-5.]"
 )
 
 SESSION_HISTORY_PREFIX = """[SYSTEM: Below are summaries of the user's previous sessions for context. 
@@ -235,7 +234,6 @@ def get_session_for_display(session_id: int) -> str:
         for m in messages:
             role_label = "Вы" if m.role == "user" else "Ассистент"
             lines.append(f"{role_label}: {m.content}")
-
         formatted = "\n\n".join(lines)
         return LOAD_SESSION_TRIGGER.format(
             date_label=session.date_label,

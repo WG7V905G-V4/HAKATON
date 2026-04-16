@@ -58,5 +58,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [UI_DIR]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# API key for Groq (variable name kept for compatibility — set HF_API_KEY in .env)
 HF_API_KEY = os.getenv('HF_API_KEY', '')
-HF_MODEL = os.getenv('HF_MODEL', 'mistralai/Mistral-7B-Instruct-v0.3')
+# Must be a Groq-supported model. Full list: https://console.groq.com/docs/models
+HF_MODEL   = os.getenv('HF_MODEL', 'llama-3.3-70b-versatile')
